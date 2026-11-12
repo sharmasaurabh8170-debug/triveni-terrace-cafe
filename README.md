@@ -1,63 +1,145 @@
-# Triveni Terrace Café Website
+# Triveni Terrace Café
 
-A React + Vite website with a futuristic 3D-inspired homepage, menu cards, café story and visit information.
+A premium, responsive website for **Triveni Terrace Café**, located at Triveni Kala Sangam, Mandi House, New Delhi.
 
-## Run locally
+Built with React and Vite, the website combines an elegant café-inspired design with interactive animations, a menu showcase and café information.
 
-```bash
-npm install
-npm run dev
-```
+## About the Project
 
-For a production build:
+Triveni Terrace Café is a frontend web development project designed to create a modern digital experience for a café.
 
-```bash
-npm run build
-npm run preview
-```
+The website focuses on clean layouts, elegant typography, interactive elements and responsive design to provide a smooth browsing experience across desktop, tablet and mobile devices.
 
-## Project structure
+## Features
+
+- Premium and elegant user interface
+- Responsive design for mobile, tablet and desktop
+- Interactive navigation
+- Animated homepage and visual elements
+- Interactive 3D-inspired menu cards
+- Menu showcase with food images, descriptions and prices
+- Café information and contact details
+- Google Maps directions
+- Mobile-friendly navigation menu
+- Smooth scrolling and animations
+- SEO-friendly page metadata
+- Custom café branding and favicon support
+
+## Technologies Used
+
+| Technology    | Purpose                            |
+| ------------- | ---------------------------------- |
+| React.js      | Frontend development               |
+| Vite          | Development server and build tool  |
+| JavaScript    | Application logic                  |
+| CSS3          | Styling and responsive layouts     |
+| Framer Motion | Animations and interactive effects |
+| Lucide React  | Icons                              |
+| Google Fonts  | Typography                         |
+
+## Project Structure
 
 ```text
 triveni-terrace-cafe/
-├── public/                       # Static files served as-is
+│
+├── public/
+│   └── favicon.png
+│
 ├── src/
-│   ├── assets/images/            # Logo and local image assets
+│   ├── assets/
+│   │   └── images/
+│   │
 │   ├── components/
-│   │   ├── layout/               # Header and Footer
-│   │   └── sections/             # Homepage sections
+│   │   ├── layout/
+│   │   │   ├── Header.jsx
+│   │   │   └── Footer.jsx
+│   │   │
+│   │   └── sections/
+│   │       ├── HeroSection.jsx
+│   │       ├── StorySection.jsx
+│   │       ├── MenuSection.jsx
+│   │       ├── TerraceSection.jsx
+│   │       └── VisitSection.jsx
+│   │
 │   ├── data/
-│   │   ├── menuData.js           # Dish names, prices, descriptions and photos
-│   │   └── siteData.js           # Address, phone, email, hours and navigation
-│   ├── pages/                    # Add separate route-level pages here
+│   │   ├── menuData.js
+│   │   └── siteData.js
+│   │
 │   ├── styles/
-│   │   ├── global.css            # Theme tokens and main layout styling
-│   │   ├── header.css            # Header-specific styles
-│   │   ├── hero.css              # Hero-specific styles
-│   │   ├── menu.css              # Menu-specific styles
-│   │   ├── sections.css          # Story, terrace and visit styles
-│   │   ├── footer.css            # Footer styles
-│   │   └── responsive.css        # Additional responsive overrides
-│   ├── App.jsx                   # Combines the homepage components
-│   └── main.jsx                  # React entry point
+│   │   ├── global.css
+│   │   ├── responsive.css
+│   │   ├── header.css
+│   │   ├── hero.css
+│   │   ├── menu.css
+│   │   ├── sections.css
+│   │   └── footer.css
+│   │
+│   ├── App.jsx
+│   └── main.jsx
+│
 ├── index.html
 ├── package.json
-└── vite.config.js (optional; add when needed)
+└── README.md
 ```
 
-## Where to make changes
+## Getting Started
 
-- **Change a dish, price, description or dish photo:** `src/data/menuData.js`
-- **Change address, phone, email, opening hours or map link:** `src/data/siteData.js`
-- **Change the café logo:** replace `src/assets/images/triveni-logo.png` with your logo (keep the same filename).
-- **Edit the header or footer:** `src/components/layout/`
-- **Edit a homepage section:** `src/components/sections/`
-- **Change colours, typography, spacing and overall design:** `src/styles/global.css`
-- **Add small component-specific CSS:** corresponding file in `src/styles/`
-- **Change the overall homepage order:** `src/App.jsx`
+Follow these steps to run the project locally.
 
-## Notes
+### 1. Clone the repository
 
-- Publicly listed prices and hours may change. Confirm them with the café before publishing.
-- Some menu images are representative images; verify image rights and exact dish matches before commercial use.
-- Remote menu photos require an internet connection.
+```bash
+git clone https://github.com/sharmasaurabh8170-debug/triveni-terrace-cafe.git
+```
+
+### 2. Open the project folder
+
+```bash
+cd triveni-terrace-cafe
+```
+
+### 3. Install dependencies
+
+```bash
+npm install
+```
+
+### 4. Start the development server
+
+```bash
+npm run dev
+```
+
+### 5. Open in your browser
+
+Visit:
+
+```text
+http://localhost:5173
+```
+
+## Customisation
+
+The website content can be updated through the data files:
+
+- `src/data/siteData.js` — Café details, contact information, address, opening hours and navigation.
+- `src/data/menuData.js` — Dish names, descriptions, prices and images.
+- `src/styles/` — Website colours, layouts, animations and responsive styling.
+
+## Future Improvements
+
+- Online table reservation system
+- Backend integration
+- Dynamic menu management
+- Customer reviews and testimonials
+- Performance and accessibility improvements
+
+## Developer
+
+**Saurabh Sharma**
+
+Frontend Developer
+
+## License
+
+This project is developed for educational and portfolio purposes.
