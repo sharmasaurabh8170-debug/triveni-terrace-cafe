@@ -1,0 +1,874 @@
+/* ============================================
+   TRIVENI TERRACE CAFE
+   GLOBAL STYLESHEET
+============================================ */
+
+/* ROOT VARIABLES */
+
+:root {
+    --cream: #f7f3e9;
+    --paper: #eee7d8;
+    --green: #263b2b;
+    --green-soft: #405441;
+    --terra: #ad593b;
+    --gold: #b58b50;
+    --ink: #292c23;
+    --muted: #777568;
+    --line: #dcd4c4;
+
+    --font-heading: 'Playfair Display', serif;
+    --font-body: 'DM Sans', sans-serif;
+
+    --transition: .3s ease;
+}
+
+/* RESET */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 100px;
+    font-size: 16px;
+}
+
+body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 17px;
+    line-height: 1.7;
+    overflow-x: hidden;
+}
+
+button,
+input,
+textarea,
+select {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+img {
+    display: block;
+    max-width: 100%;
+}
+
+.site-shell {
+    width: 100%;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+h1,
+h2,
+h3,
+h4 {
+    font-family: var(--font-heading);
+    font-weight: 500;
+    color: var(--green);
+}
+
+p {
+    margin-bottom: 0;
+}
+
+section {
+    position: relative;
+}
+
+button:focus-visible,
+a:focus-visible {
+    outline: 2px solid var(--terra);
+    outline-offset: 4px;
+}
+
+::selection {
+    background: var(--green);
+    color: var(--cream);
+}
+
+/* ============================================
+   SHARED BUTTONS
+============================================ */
+
+.primary-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    padding: 16px 25px;
+
+    border: 1px solid var(--green);
+    background: var(--green);
+    color: var(--cream);
+
+    font-size: 15px;
+
+    transition:
+        background var(--transition),
+        transform var(--transition);
+}
+
+.primary-button:hover {
+    background: var(--terra);
+    border-color: var(--terra);
+    transform: translateY(-3px);
+}
+
+.quiet-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+
+    border: 0;
+    background: transparent;
+    color: var(--green);
+
+    font-size: 15px;
+
+    transition: color var(--transition);
+}
+
+.quiet-button:hover {
+    color: var(--terra);
+}
+
+.light-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+
+    padding: 16px 25px;
+
+    border: 0;
+    background: var(--cream);
+    color: var(--green);
+
+    transition:
+        background var(--transition),
+        transform var(--transition);
+}
+
+.light-button:hover {
+    background: #e4d4b9;
+    transform: translateY(-3px);
+}
+
+/* ============================================
+   SHARED SECTION SPACING
+============================================ */
+
+.section-pad {
+    padding-left: 10%;
+    padding-right: 10%;
+}
+
+/* ============================================
+   STORY SECTION
+============================================ */
+
+.story-section {
+    display: block;
+
+    padding-top: 110px;
+    padding-bottom: 110px;
+
+    background: #f0eadf;
+}
+
+.story-content {
+    width: 100%;
+    max-width: 850px;
+    margin: 0 auto;
+}
+
+.story-content h2 {
+    margin-bottom: 25px;
+
+    font-size: clamp(42px, 4.5vw, 65px);
+    line-height: 1.15;
+}
+
+.story-content h2 em {
+    color: var(--terra);
+}
+
+.story-content p {
+    max-width: 700px;
+
+    color: var(--muted);
+    font-size: 17px;
+    line-height: 1.9;
+}
+
+.underlined-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 15px;
+
+    margin-top: 22px;
+    padding: 8px 0;
+
+    border: 0;
+    border-bottom: 1px solid var(--gold);
+
+    background: transparent;
+    color: var(--green);
+
+    font-size: 15px;
+    cursor: pointer;
+
+    transition: color var(--transition);
+}
+
+.underlined-link:hover {
+    color: var(--terra);
+}
+
+/* ============================================
+   3D MENU SECTION
+============================================ */
+
+.menu-section {
+    position: relative;
+
+    padding: 120px 8%;
+
+    background:
+        radial-gradient(
+            ellipse at 10% 10%,
+            #e9dfc9,
+            transparent 45%
+        ),
+        linear-gradient(
+            135deg,
+            #f8f4e9,
+            #eee6d6
+        );
+
+    overflow: hidden;
+}
+
+/* BACKGROUND DETAILS */
+
+.menu-section::before {
+    content: "";
+
+    position: absolute;
+    width: 450px;
+    height: 450px;
+
+    top: 10%;
+    right: -200px;
+
+    border: 1px solid rgba(181, 139, 80, .25);
+    border-radius: 50%;
+
+    pointer-events: none;
+}
+
+.menu-section::after {
+    content: "";
+
+    position: absolute;
+    width: 300px;
+    height: 300px;
+
+    bottom: -150px;
+    left: -100px;
+
+    border: 1px solid rgba(38, 59, 43, .15);
+    border-radius: 50%;
+
+    pointer-events: none;
+}
+
+/* MENU HEADING */
+
+.menu-heading {
+    position: relative;
+    z-index: 2;
+
+    display: flex;
+    justify-content: flex-start;
+
+    margin-bottom: 65px;
+}
+
+.menu-heading h2 {
+    color: var(--green);
+
+    font-size: clamp(45px, 5vw, 72px);
+    letter-spacing: -2px;
+}
+
+.menu-heading h2 em {
+    color: var(--terra);
+}
+
+/* MENU GRID */
+
+.dish-grid {
+    position: relative;
+    z-index: 2;
+
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+
+    gap: 45px 30px;
+
+    perspective: 1200px;
+}
+
+/* DISH CARD */
+
+.dish-card {
+    position: relative;
+    min-width: 0;
+
+    padding: 0 0 20px;
+
+    overflow: hidden;
+
+    background: rgba(255, 255, 255, .72);
+
+    border: 1px solid rgba(181, 139, 80, .25);
+    border-radius: 5px;
+
+    box-shadow:
+        0 8px 15px rgba(38, 59, 43, .06),
+        0 20px 35px rgba(38, 59, 43, .08);
+
+    transform-style: preserve-3d;
+
+    transition:
+        transform .5s cubic-bezier(.2, .8, .2, 1),
+        box-shadow .5s ease,
+        border-color .5s ease;
+}
+
+.dish-card:hover {
+    transform: translateY(-14px) rotateX(3deg) rotateY(-3deg);
+
+    border-color: var(--gold);
+
+    box-shadow:
+        0 15px 25px rgba(38, 59, 43, .10),
+        0 35px 60px rgba(38, 59, 43, .18);
+}
+
+/* DISH IMAGE */
+
+.dish-photo-wrap {
+    position: relative;
+
+    height: 260px;
+
+    overflow: hidden;
+    transform-style: preserve-3d;
+}
+
+.dish-photo {
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+
+    transition:
+        transform .8s cubic-bezier(.2, .8, .2, 1);
+}
+
+.dish-card:hover .dish-photo {
+    transform: scale(1.12) translateZ(25px);
+}
+
+.dish-photo-wrap::after {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    background: linear-gradient(
+        to top,
+        rgba(20, 36, 25, .35),
+        transparent 55%
+    );
+
+    pointer-events: none;
+}
+
+/* DISH DETAILS */
+
+.dish-meta,
+.dish-card h3,
+.dish-card > p {
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+.dish-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin-top: 22px;
+
+    color: var(--terra);
+
+    font-size: 12px;
+    letter-spacing: 1.5px;
+}
+
+.dish-meta span + span {
+    color: var(--green);
+
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: normal;
+}
+
+.dish-card h3 {
+    margin-top: 13px;
+    margin-bottom: 8px;
+
+    font-size: 27px;
+    line-height: 1.3;
+
+    transform: translateZ(15px);
+}
+
+.dish-card > p {
+    min-height: 55px;
+
+    color: var(--muted);
+
+    font-size: 15px;
+    line-height: 1.7;
+}
+
+/* FAVOURITES BUTTON */
+
+.add-button {
+    width: calc(100% - 40px);
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin: 12px 20px 0;
+    padding: 13px 0;
+
+    border: 0;
+    border-top: 1px solid var(--line);
+
+    background: transparent;
+    color: var(--green);
+
+    font-weight: 600;
+
+    transition: color .3s ease;
+}
+
+.add-button:hover {
+    color: var(--terra);
+}
+
+.add-button span {
+    font-size: 25px;
+    color: var(--gold);
+}
+
+.dish-card:focus-within {
+    outline: 2px solid var(--gold);
+    outline-offset: 5px;
+}
+
+/* MENU NOTE */
+
+.menu-note {
+    margin-top: 35px;
+
+    color: var(--muted);
+
+    font-size: 13px;
+    text-align: center;
+}
+
+/* ============================================
+   TERRACE SECTION
+============================================ */
+
+.terrace-section {
+    padding: 0 5%;
+}
+
+.terrace-backdrop {
+    position: relative;
+
+    min-height: 470px;
+
+    display: flex;
+    align-items: center;
+
+    overflow: hidden;
+
+    padding: 70px 10%;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(27, 48, 34, .96),
+            rgba(27, 48, 34, .72) 55%,
+            rgba(27, 48, 34, .2)
+        ),
+        radial-gradient(
+            ellipse at 80% 20%,
+            #d4a56d,
+            #5a684c 52%,
+            #263b2b
+        );
+}
+
+.terrace-copy {
+    position: relative;
+    z-index: 2;
+
+    max-width: 600px;
+
+    color: #fff8ed;
+}
+
+.terrace-copy h2 {
+    margin-bottom: 22px;
+
+    color: #fff8ed;
+
+    font-size: clamp(42px, 5.2vw, 68px);
+    line-height: 1.12;
+}
+
+.terrace-copy h2 em {
+    color: #e5bd91;
+}
+
+.terrace-copy p {
+    margin-bottom: 25px;
+
+    color: #e0dfd1;
+
+    font-size: 17px;
+    line-height: 1.8;
+}
+
+.terrace-sun {
+    position: absolute;
+
+    top: 12%;
+    right: 15%;
+
+    width: 270px;
+    height: 270px;
+
+    border-radius: 50%;
+
+    background: rgba(227, 190, 137, .4);
+}
+
+/* ============================================
+   VISIT SECTION
+============================================ */
+
+.visit-section {
+    display: grid;
+
+    grid-template-columns: 1fr .9fr;
+    gap: 10%;
+
+    align-items: center;
+
+    padding-top: 125px;
+    padding-bottom: 125px;
+}
+
+.visit-intro h2 {
+    margin: 20px 0;
+
+    font-size: clamp(42px, 5vw, 64px);
+    line-height: 1.15;
+}
+
+.visit-intro h2 em {
+    color: var(--terra);
+}
+
+.visit-intro p {
+    max-width: 510px;
+
+    color: var(--muted);
+
+    font-size: 17px;
+    line-height: 1.9;
+}
+
+/* VISIT CARD */
+
+.visit-card {
+    padding: 35px 38px;
+    background: var(--paper);
+}
+
+.visit-detail {
+    display: flex;
+    gap: 17px;
+
+    padding-bottom: 23px;
+    margin-bottom: 22px;
+
+    border-bottom: 1px solid #d8cfbe;
+
+    color: var(--green);
+}
+
+.visit-detail svg {
+    width: 21px;
+
+    flex-shrink: 0;
+
+    color: var(--terra);
+    stroke-width: 1.5;
+}
+
+.visit-detail div {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.visit-detail b {
+    font-family: var(--font-heading);
+
+    font-size: 19px;
+    font-weight: 500;
+}
+
+.visit-detail span {
+    color: var(--muted);
+
+    font-size: 15px;
+    line-height: 1.7;
+
+    overflow-wrap: anywhere;
+}
+
+.visit-detail small {
+    font-size: 12px;
+}
+
+.visit-detail a:hover {
+    color: var(--terra);
+}
+
+.visit-card .primary-button {
+    width: 100%;
+}
+
+.map-button {
+    display: flex;
+    justify-content: center;
+    text-decoration: none;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+============================================ */
+
+/* TABLET */
+
+@media (max-width: 1050px) {
+    .section-pad {
+        padding-left: 7%;
+        padding-right: 7%;
+    }
+
+    .menu-section {
+        padding: 90px 6%;
+    }
+
+    .dish-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .visit-section {
+        gap: 5%;
+    }
+}
+
+@media (max-width: 900px) {
+    .visit-section {
+        grid-template-columns: 1fr;
+        gap: 40px;
+
+        padding-top: 85px;
+        padding-bottom: 85px;
+    }
+
+    .visit-card {
+        width: 100%;
+    }
+}
+
+/* MOBILE */
+
+@media (max-width: 600px) {
+    body {
+        font-size: 15px;
+    }
+
+    .section-pad {
+        padding-left: 7%;
+        padding-right: 7%;
+    }
+
+    /* STORY */
+
+    .story-section {
+        padding-top: 75px;
+        padding-bottom: 75px;
+    }
+
+    .story-content h2 {
+        font-size: 40px;
+    }
+
+    .story-content p {
+        font-size: 15px;
+    }
+
+    /* MENU */
+
+    .menu-section {
+        padding: 75px 6%;
+    }
+
+    .menu-heading {
+        margin-bottom: 35px;
+    }
+
+    .menu-heading h2 {
+        font-size: 43px;
+        letter-spacing: -1px;
+    }
+
+    .dish-grid {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+
+    .dish-photo-wrap {
+        height: 250px;
+    }
+
+    .dish-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .dish-card h3 {
+        font-size: 24px;
+    }
+
+    /* TERRACE */
+
+    .terrace-section {
+        padding: 0 3%;
+    }
+
+    .terrace-backdrop {
+        min-height: 400px;
+        padding: 55px 8%;
+    }
+
+    .terrace-copy h2 {
+        font-size: 43px;
+    }
+
+    .terrace-copy p {
+        font-size: 15px;
+    }
+
+    .terrace-sun {
+        width: 180px;
+        height: 180px;
+        right: -40px;
+    }
+
+    /* VISIT */
+
+    .visit-section {
+        padding-top: 75px;
+        padding-bottom: 75px;
+    }
+
+    .visit-intro h2 {
+        font-size: 42px;
+    }
+
+    .visit-intro p {
+        font-size: 15px;
+    }
+
+    .visit-card {
+        padding: 25px 20px;
+    }
+}
+
+/* SMALL MOBILE */
+
+@media (max-width: 360px) {
+    .dish-photo-wrap {
+        height: 210px;
+    }
+
+    .visit-card {
+        padding: 22px 15px;
+    }
+
+    .primary-button,
+    .light-button {
+        padding: 14px 18px;
+        font-size: 14px;
+    }
+}
+
+/* REDUCED MOTION */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+    }
+
+    .dish-card:hover,
+    .dish-card:hover .dish-photo {
+        transform: none;
+    }
+}

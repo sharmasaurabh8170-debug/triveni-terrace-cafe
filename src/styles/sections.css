@@ -1,0 +1,228 @@
+/* ==========================================
+   TRIVENI TERRACE CAFE
+   STORY, TERRACE & VISIT SECTIONS
+========================================== */
+
+
+/* ==========================================
+   STORY SECTION
+========================================== */
+
+.story-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 110px 7%;
+}
+
+.story-content {
+    width: 100%;
+    max-width: 850px;
+    margin: 0 auto;
+}
+
+.story-content h2 {
+    font-size: clamp(38px, 5vw, 65px);
+    line-height: 1.2;
+    margin-bottom: 25px;
+}
+
+.story-content h2 em {
+    color: var(--terra);
+}
+
+.story-content p {
+    max-width: 700px;
+
+    font-size: 17px;
+    line-height: 1.9;
+
+    color: var(--muted);
+}
+
+
+/* ==========================================
+   TERRACE SECTION
+========================================== */
+
+.terrace-section {
+    padding: 0 5%;
+}
+
+.terrace-backdrop {
+    position: relative;
+
+    min-height: 480px;
+
+    display: flex;
+    align-items: center;
+
+    overflow: hidden;
+    padding: 80px 10%;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(27, 48, 34, .96),
+            rgba(27, 48, 34, .72)
+        ),
+        radial-gradient(
+            ellipse at 80% 20%,
+            #d4a56d,
+            #5a684c 52%,
+            #263b2b
+        );
+}
+
+.terrace-copy {
+    position: relative;
+    z-index: 2;
+
+    max-width: 600px;
+    color: var(--cream);
+}
+
+.terrace-copy h2 {
+    margin-bottom: 22px;
+
+    color: var(--cream);
+
+    font-size: clamp(45px, 5vw, 70px);
+    line-height: 1.15;
+}
+
+.terrace-copy h2 em {
+    color: #e5bd91;
+}
+
+.terrace-copy p {
+    margin-bottom: 28px;
+
+    color: #e0dfd1;
+    font-size: 18px;
+}
+
+.terrace-sun {
+    position: absolute;
+
+    top: 12%;
+    right: 15%;
+
+    width: 270px;
+    height: 270px;
+
+    border-radius: 50%;
+
+    background: rgba(227, 190, 137, .3);
+
+    pointer-events: none;
+}
+
+
+/* ==========================================
+   VISIT SECTION
+========================================== */
+
+.visit-detail a {
+    transition: color .3s ease;
+}
+
+.visit-detail a:hover {
+    color: var(--terra);
+    text-decoration: underline;
+}
+
+
+/* ==========================================
+   TABLET
+========================================== */
+
+@media (max-width: 1000px) {
+
+    .story-section {
+        padding: 90px 6%;
+    }
+
+    .terrace-backdrop {
+        padding: 70px 8%;
+    }
+}
+
+
+/* ==========================================
+   MOBILE
+========================================== */
+
+@media (max-width: 760px) {
+
+    .story-section {
+        padding: 70px 7%;
+    }
+
+    .story-content h2 {
+        font-size: clamp(36px, 8vw, 48px);
+    }
+
+    .story-content p {
+        font-size: 16px;
+        line-height: 1.8;
+    }
+
+    .terrace-section {
+        padding: 0 4%;
+    }
+
+    .terrace-backdrop {
+        min-height: 400px;
+        padding: 60px 8%;
+    }
+
+    .terrace-copy h2 {
+        font-size: clamp(40px, 9vw, 55px);
+    }
+
+    .terrace-copy p {
+        font-size: 16px;
+        line-height: 1.8;
+    }
+
+    .terrace-sun {
+        width: 180px;
+        height: 180px;
+        right: -40px;
+    }
+}
+
+
+/* ==========================================
+   SMALL MOBILE
+========================================== */
+
+@media (max-width: 390px) {
+
+    .story-section {
+        padding: 60px 6%;
+    }
+
+    .terrace-backdrop {
+        min-height: 360px;
+        padding: 50px 7%;
+    }
+
+    .terrace-copy h2 {
+        font-size: 38px;
+    }
+}
+
+
+/* ==========================================
+   ACCESSIBILITY
+========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .visit-detail a {
+        transition: none;
+    }
+}

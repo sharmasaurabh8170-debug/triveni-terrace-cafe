@@ -1,0 +1,104 @@
+/* ==========================================
+   TRIVENI TERRACE CAFE
+   RESPONSIVE OVERRIDES
+========================================== */
+
+/* PREVENT HORIZONTAL OVERFLOW */
+
+html,
+body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+.site-shell {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: clip;
+}
+
+/* TABLET */
+
+@media (max-width: 1000px) {
+    .hero.hero-future {
+        overflow: hidden;
+    }
+
+    .visit-card {
+        width: 100%;
+    }
+}
+
+/* MOBILE */
+
+@media (max-width: 760px) {
+
+    /* VISIT SECTION */
+
+    .visit-detail {
+        align-items: flex-start;
+        gap: 14px;
+    }
+
+    .visit-detail span {
+        overflow-wrap: anywhere;
+        word-break: normal;
+    }
+
+    .visit-detail a {
+        overflow-wrap: anywhere;
+    }
+
+    /* BUTTONS */
+
+    .primary-button,
+    .book-button,
+    .light-button {
+        min-height: 48px;
+    }
+
+    /* MENU */
+
+    .dish-card {
+        width: 100%;
+    }
+
+    .dish-photo {
+        max-width: 100%;
+    }
+
+    /* FOOTER */
+
+    .footer-contact a {
+        overflow-wrap: anywhere;
+    }
+}
+
+/* SMALL MOBILE */
+
+@media (max-width: 390px) {
+
+    .hero-future .hero-actions {
+        align-items: flex-start;
+    }
+
+    .visit-detail {
+        gap: 10px;
+    }
+
+    .visit-detail svg {
+        flex-shrink: 0;
+    }
+
+    .primary-button {
+        max-width: 100%;
+    }
+}
+
+/* ACCESSIBILITY */
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+}

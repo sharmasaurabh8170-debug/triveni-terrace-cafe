@@ -1,0 +1,160 @@
+/* =====================================
+   TRIVENI TERRACE CAFE - FOOTER
+===================================== */
+
+.footer {
+    display: block;
+    background: #263b2b;
+    color: #f7f3e9;
+    padding: 65px 7% 0;
+}
+
+/* MAIN FOOTER */
+
+.footer-main {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr 1.2fr;
+    gap: 55px;
+    padding-bottom: 55px;
+}
+
+/* BRAND */
+
+.footer-brand {
+    max-width: 300px;
+}
+
+.footer-logo-link {
+    display: inline-block;
+}
+
+.footer-logo {
+    width: 230px;
+    height: 105px;
+    object-fit: contain;
+    object-position: left center;
+}
+
+/* FOOTER COLUMNS */
+
+.footer-column {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.footer-column h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 500;
+    color: #f7f0e1;
+    margin-bottom: 8px;
+}
+
+.footer-column > a {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    color: #d0d2c5;
+    font-size: 14px;
+    line-height: 1.7;
+    transition: color 0.3s ease;
+}
+
+.footer-column > a:hover {
+    color: #d5a77a;
+}
+
+.footer-contact svg {
+    color: #d5a77a;
+    flex-shrink: 0;
+    margin-top: 3px;
+}
+
+/* BOTTOM BAR */
+
+.footer-bottom {
+    min-height: 75px;
+    border-top: 1px solid rgba(255, 255, 255, 0.17);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    color: #c5c9bc;
+    font-size: 12px;
+}
+
+.back-to-top {
+    color: #f7f3e9;
+    font-size: 13px;
+    transition: color 0.3s ease;
+}
+
+.back-to-top:hover {
+    color: #d5a77a;
+}
+
+/* TABLET */
+
+@media (max-width: 1050px) {
+    .footer-main {
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+    }
+
+    .footer-brand {
+        grid-column: 1 / -1;
+    }
+}
+
+/* MOBILE */
+
+@media (max-width: 600px) {
+    .footer {
+        padding: 50px 7% 0;
+    }
+
+    .footer-main {
+        grid-template-columns: 1fr 1fr;
+        gap: 35px 20px;
+        padding-bottom: 35px;
+    }
+
+    .footer-brand {
+        grid-column: 1 / -1;
+        max-width: 100%;
+    }
+
+    .footer-logo {
+        width: 200px;
+        height: 90px;
+    }
+
+    .footer-column h3 {
+        font-size: 19px;
+    }
+
+    .footer-column > a {
+        font-size: 13px;
+    }
+
+    .footer-bottom {
+        padding: 20px 0;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+}
+
+/* SMALL MOBILE */
+
+@media (max-width: 360px) {
+    .footer-main {
+        grid-template-columns: 1fr;
+    }
+
+    .footer-brand {
+        grid-column: auto;
+    }
+}
