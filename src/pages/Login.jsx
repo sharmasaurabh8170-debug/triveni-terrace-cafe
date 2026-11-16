@@ -1,17 +1,22 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { Eye, EyeOff } from 'lucide-react';
+
 import { supabase } from '../lib/supabaseClient';
+import AuthLayout from '../components/auth/AuthLayout';
 
 export default function Login() {
+    const navigate = useNavigate();
+
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [message, setMessage] = useState('');
     const [loading, setLoading] = useState(false);
 
-    const navigate = useNavigate();
-
     const handleSubmit = async (e) => {
         e.preventDefault();
+
         setLoading(true);
         setMessage('');
 
@@ -24,55 +29,67 @@ export default function Login() {
 
         if (error) {
             setMessage(error.message);
-        } else {
-            navigate('/dashboard');
+            return;
         }
+
+        navigate('/dashboard');
     };
 
     return (
-        <div className="auth-page">
-            <div className="auth-card">
-                <h1>Welcome Back</h1>
-                <p>Login to your Triveni Terrace Café account.</p>
+        <AuthLayout
+            title="Welcome Back"
+            subtitle="Sign in to your Triveni Terrace Café account."
+        >
+            <form className="auth-form" onSubmit={handleSubmit}>
 
-                <form onSubmit={handleSubmit}>
-                    <label>Email Address</label>
-                    <input
-                        type="email"
-                        placeholder="Enter your email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                    />
+                <label>Email Address</label>
 
-                    <label>Password</label>
+                <input
+                    type="email"
+                    placeholder="Enter your email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                />
+
+                <label>Password</label>
+
+                <div className="password-wrapper">
                     <input
-                        type="password"
+                        type={showPassword ? 'text' : 'password'}
                         placeholder="Enter your password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
                     />
 
-                    <div className="forgot-link">
-                        <Link to="/forgot-password">Forgot Password?</Link>
-                    </div>
-
-                    <button type="submit" disabled={loading}>
-                        {loading ? 'Logging in...' : 'Login'}
+                    <button
+                        type="button"
+                        className="password-toggle"
+                        onClick={() => setShowPassword(!showPassword)}
+                        aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    >
+                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>
-                </form>
+                </div>
 
-                {message && <p className="auth-message">{message}</p>}
+                <div className="forgot-link">
+                    <Link to="/forgot-password">Forgot Password?</Link>
+                </div>
 
-                <p className="auth-switch">
-                    Don't have an account? <Link to="/register">Register</Link>
-                </p>
+                <button type="submit" disabled={loading}>
+                    {loading ? 'Signing In...' : 'Sign In'}
+                </button>
 
-                <Link to="/" className="back-home">
-                    Back to Home
-                </Link>
-            </div>
-        </div>
+            </form>
+
+            {message && (
+                <p className="auth-message">{message}</p>
+            )}
+
+            <p className="auth-switch">
+                Don't have an account? <Link to="/register">Create Account</Link>
+            </p>
+        </AuthLayout>
     );
 }

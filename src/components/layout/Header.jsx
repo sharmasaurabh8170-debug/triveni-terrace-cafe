@@ -122,13 +122,17 @@ export default function Header({ cartCount, onNavigate }) {
                     <span>{cartCount}</span>
                 </button>
 
-                <button
-                    className="book-button"
-                    onClick={() => navigate('visit')}
-                >
-                    Find the café
-                    <ArrowUpRight size={18} />
-                </button>
+                <Link
+    to="/reservation"
+    className="reserve-button"
+    onClick={() => setMenuOpen(false)}
+>
+    Reserve a Table
+</Link>
+
+<button className="book-button" onClick={() => navigate('visit')}>
+    Find the café <ArrowUpRight size={18}/>
+</button>
 
                 {/* Profile */}
                 {user && (

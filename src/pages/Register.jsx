@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Eye, EyeOff } from 'lucide-react';
+
 import { supabase } from '../lib/supabaseClient';
+import AuthLayout from '../components/auth/AuthLayout';
 
 export default function Register() {
     const [form, setForm] = useState({
@@ -10,6 +13,8 @@ export default function Register() {
         confirmPassword: ''
     });
 
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [message, setMessage] = useState('');
     const [loading, setLoading] = useState(false);
 
@@ -24,13 +29,13 @@ export default function Register() {
         e.preventDefault();
         setMessage('');
 
-        if (form.password !== form.confirmPassword) {
-            setMessage('Passwords do not match.');
+        if (form.password.length < 8) {
+            setMessage('Password must contain at least 8 characters.');
             return;
         }
 
-        if (form.password.length < 8) {
-            setMessage('Password must contain at least 8 characters.');
+        if (form.password !== form.confirmPassword) {
+            setMessage('Passwords do not match.');
             return;
         }
 
@@ -53,41 +58,52 @@ export default function Register() {
             setMessage(error.message);
         } else {
             setMessage(
-                'Registration successful! Please check your email to verify your account.'
+                'Account created! Please check your email and verify your account before logging in.'
             );
+
+            setForm({
+                name: '',
+                email: '',
+                password: '',
+                confirmPassword: ''
+            });
         }
     };
 
     return (
-        <div className="auth-page">
-            <div className="auth-card">
-                <h1>Create Account</h1>
-                <p>Register to enjoy Triveni Terrace Café services.</p>
+        <AuthLayout
+            title="Create Account"
+            subtitle="Join us and make your café experience special."
+        >
+            <form className="auth-form" onSubmit={handleSubmit}>
 
-                <form onSubmit={handleSubmit}>
-                    <label>Full Name</label>
-                    <input
-                        type="text"
-                        name="name"
-                        placeholder="Enter your full name"
-                        value={form.name}
-                        onChange={handleChange}
-                        required
-                    />
+                <label>Full Name</label>
 
-                    <label>Email Address</label>
-                    <input
-                        type="email"
-                        name="email"
-                        placeholder="Enter your email"
-                        value={form.email}
-                        onChange={handleChange}
-                        required
-                    />
+                <input
+                    type="text"
+                    name="name"
+                    placeholder="Enter your full name"
+                    value={form.name}
+                    onChange={handleChange}
+                    required
+                />
 
-                    <label>Password</label>
+                <label>Email Address</label>
+
+                <input
+                    type="email"
+                    name="email"
+                    placeholder="Enter your email"
+                    value={form.email}
+                    onChange={handleChange}
+                    required
+                />
+
+                <label>Password</label>
+
+                <div className="password-wrapper">
                     <input
-                        type="password"
+                        type={showPassword ? 'text' : 'password'}
                         name="password"
                         placeholder="Minimum 8 characters"
                         value={form.password}
@@ -96,9 +112,21 @@ export default function Register() {
                         required
                     />
 
-                    <label>Confirm Password</label>
+                    <button
+                        type="button"
+                        className="password-toggle"
+                        onClick={() => setShowPassword(!showPassword)}
+                        aria-label="Toggle password visibility"
+                    >
+                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                </div>
+
+                <label>Confirm Password</label>
+
+                <div className="password-wrapper">
                     <input
-                        type="password"
+                        type={showConfirmPassword ? 'text' : 'password'}
                         name="confirmPassword"
                         placeholder="Confirm your password"
                         value={form.confirmPassword}
@@ -106,21 +134,29 @@ export default function Register() {
                         required
                     />
 
-                    <button type="submit" disabled={loading}>
-                        {loading ? 'Creating Account...' : 'Create Account'}
+                    <button
+                        type="button"
+                        className="password-toggle"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        aria-label="Toggle confirm password visibility"
+                    >
+                        {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>
-                </form>
+                </div>
 
-                {message && <p className="auth-message">{message}</p>}
+                <button type="submit" disabled={loading}>
+                    {loading ? 'Creating Account...' : 'Create Account'}
+                </button>
 
-                <p className="auth-switch">
-                    Already have an account? <Link to="/login">Login</Link>
-                </p>
+            </form>
 
-                <Link to="/" className="back-home">
-                    Back to Home
-                </Link>
-            </div>
-        </div>
+            {message && (
+                <p className="auth-message">{message}</p>
+            )}
+
+            <p className="auth-switch">
+                Already have an account? <Link to="/login">Sign In</Link>
+            </p>
+        </AuthLayout>
     );
 }

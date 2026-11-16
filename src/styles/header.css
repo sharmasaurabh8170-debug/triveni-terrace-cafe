@@ -383,3 +383,28 @@
     cursor: pointer;
     font-size: 14px;
 }
+
+.reserve-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 11px 18px;
+    background: #294b35;
+    color: white;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    transition: background 0.3s ease;
+}
+
+.reserve-button:hover {
+    background: #1d3928;
+}
+
+@media (max-width: 850px) {
+    .reserve-button {
+        padding: 9px 12px;
+        font-size: 12px;
+    }
+}

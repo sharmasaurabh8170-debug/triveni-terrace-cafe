@@ -12,6 +12,11 @@ import VisitSection from './components/sections/VisitSection.jsx';
 
 import Register from './pages/Register.jsx';
 import Login from './pages/Login.jsx';
+import Dashboard from './pages/Dashboard.jsx';
+import ForgotPassword from './pages/ForgotPassword.jsx';
+import ResetPassword from './pages/ResetPassword.jsx';
+import Reservation from './pages/Reservation.jsx';
+import AdminDashboard from './pages/AdminDashboard.jsx';
 
 import './styles/global.css';
 import './styles/responsive.css';
@@ -63,6 +68,13 @@ export default function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/reservation" element={<Reservation />} />
+            <Route path="/admin" element={<AdminDashboard />} />
+
+            
         </Routes>
     );
 }

@@ -1,126 +1,186 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import {
+    UserRound,
+    CalendarDays,
+    ShoppingBag,
+    LogOut,
+    ArrowLeft
+} from 'lucide-react';
+
 import { supabase } from '../lib/supabaseClient';
+import '../styles/auth.css';
 
-export default function Register() {
-    const [form, setForm] = useState({
-        name: '',
-        email: '',
-        password: '',
-        confirmPassword: ''
-    });
+export default function Dashboard() {
+    const navigate = useNavigate();
 
-    const [message, setMessage] = useState('');
-    const [loading, setLoading] = useState(false);
+    const [user, setUser] = useState(null);
+    const [reservations, setReservations] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    const handleChange = (e) => {
-        setForm({
-            ...form,
-            [e.target.name]: e.target.value
-        });
-    };
+    useEffect(() => {
+        let mounted = true;
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setMessage('');
+        const loadDashboard = async () => {
+            const { data: { session } } =
+                await supabase.auth.getSession();
 
-        if (form.password !== form.confirmPassword) {
-            setMessage('Passwords do not match.');
-            return;
-        }
+            if (!mounted) return;
 
-        if (form.password.length < 8) {
-            setMessage('Password must contain at least 8 characters.');
-            return;
-        }
-
-        setLoading(true);
-
-        const { error } = await supabase.auth.signUp({
-            email: form.email,
-            password: form.password,
-            options: {
-                data: {
-                    full_name: form.name
-                },
-                emailRedirectTo: `${window.location.origin}/dashboard`
+            if (!session) {
+                navigate('/login', { replace: true });
+                return;
             }
-        });
 
-        setLoading(false);
+            setUser(session.user);
 
-        if (error) {
-            setMessage(error.message);
-        } else {
-            setMessage(
-                'Registration successful! Please check your email to verify your account.'
-            );
-        }
+            const { data, error } = await supabase
+                .from('reservations')
+                .select('*')
+                .eq('user_id', session.user.id)
+                .order('created_at', { ascending: false });
+
+            if (!mounted) return;
+
+            if (error) {
+                console.error('Reservation error:', error.message);
+            } else {
+                setReservations(data || []);
+            }
+
+            setLoading(false);
+        };
+
+        loadDashboard();
+
+        return () => {
+            mounted = false;
+        };
+    }, [navigate]);
+
+    const handleLogout = async () => {
+        await supabase.auth.signOut();
+        navigate('/login', { replace: true });
     };
+
+    if (loading) {
+        return <div className="dashboard-loading">
+            Loading your dashboard...
+        </div>;
+    }
+
+    if (!user) return null;
+
+    const name =
+        user.user_metadata?.full_name ||
+        user.email?.split('@')[0] ||
+        'Customer';
 
     return (
-        <div className="auth-page">
-            <div className="auth-card">
-                <h1>Create Account</h1>
-                <p>Register to enjoy Triveni Terrace Café services.</p>
+        <div className="dashboard-page">
 
-                <form onSubmit={handleSubmit}>
-                    <label>Full Name</label>
-                    <input
-                        type="text"
-                        name="name"
-                        placeholder="Enter your full name"
-                        value={form.name}
-                        onChange={handleChange}
-                        required
-                    />
+            <header className="dashboard-header">
+                <Link to="/" className="dashboard-brand">
+                    TRIVENI TERRACE CAFÉ
+                </Link>
 
-                    <label>Email Address</label>
-                    <input
-                        type="email"
-                        name="email"
-                        placeholder="Enter your email"
-                        value={form.email}
-                        onChange={handleChange}
-                        required
-                    />
+                <button
+                    onClick={handleLogout}
+                    className="dashboard-logout"
+                >
+                    <LogOut size={17} />
+                    Logout
+                </button>
+            </header>
 
-                    <label>Password</label>
-                    <input
-                        type="password"
-                        name="password"
-                        placeholder="Minimum 8 characters"
-                        value={form.password}
-                        onChange={handleChange}
-                        minLength={8}
-                        required
-                    />
+            <main className="dashboard-container">
 
-                    <label>Confirm Password</label>
-                    <input
-                        type="password"
-                        name="confirmPassword"
-                        placeholder="Confirm your password"
-                        value={form.confirmPassword}
-                        onChange={handleChange}
-                        required
-                    />
-
-                    <button type="submit" disabled={loading}>
-                        {loading ? 'Creating Account...' : 'Create Account'}
-                    </button>
-                </form>
-
-                {message && <p className="auth-message">{message}</p>}
-
-                <p className="auth-switch">
-                    Already have an account? <Link to="/login">Login</Link>
-                </p>
-
-                <Link to="/" className="back-home">
+                <Link to="/" className="dashboard-back">
+                    <ArrowLeft size={16} />
                     Back to Home
                 </Link>
-            </div>
+
+                <section className="dashboard-welcome">
+                    <span>YOUR ACCOUNT</span>
+                    <h1>Welcome, {name}!</h1>
+                    <p>Manage your café experience from one place.</p>
+                </section>
+
+                <section className="dashboard-grid">
+
+                    <div className="dashboard-card">
+                        <UserRound size={25} />
+                        <h3>My Profile</h3>
+                        <p>{user.email}</p>
+                        <span className="account-status">
+                            {user.email_confirmed_at
+                                ? 'Email Verified'
+                                : 'Email Not Verified'}
+                        </span>
+                    </div>
+
+                    <div className="dashboard-card">
+                        <CalendarDays size={25} />
+                        <h3>My Reservations</h3>
+                        <p>{reservations.length} booking(s)</p>
+                    </div>
+
+                    <div className="dashboard-card">
+                        <ShoppingBag size={25} />
+                        <h3>My Orders</h3>
+                        <p>Food ordering coming soon.</p>
+                    </div>
+
+                </section>
+
+                <section className="dashboard-details">
+                    <h2>My Reservations</h2>
+
+                    {reservations.length === 0 ? (
+                        <div className="empty-reservations">
+                            <CalendarDays size={35} />
+                            <p>You haven't made any reservations yet.</p>
+                            <Link to="/reservation">
+                                Reserve a Table
+                            </Link>
+                        </div>
+                    ) : (
+                        <div className="reservation-list">
+                            {reservations.map((booking) => (
+                                <div
+                                    className="reservation-item"
+                                    key={booking.id}
+                                >
+                                    <div>
+                                        <h3>
+                                            {new Date(
+                                                `${booking.reservation_date}T00:00:00`
+                                            ).toLocaleDateString('en-IN', {
+                                                day: 'numeric',
+                                                month: 'long',
+                                                year: 'numeric'
+                                            })}
+                                        </h3>
+
+                                        <p>
+                                            Time: {booking.reservation_time}
+                                        </p>
+
+                                        <p>
+                                            Guests: {booking.guests}
+                                        </p>
+                                    </div>
+
+                                    <span className={`booking-status ${booking.status}`}>
+                                        {booking.status}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </section>
+
+            </main>
         </div>
     );
 }

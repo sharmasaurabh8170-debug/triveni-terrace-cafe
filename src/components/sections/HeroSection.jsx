@@ -1,4 +1,5 @@
-import { ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight, CalendarDays } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { cafe } from '../../data/siteData';
 import '../../styles/hero.css';
 
@@ -9,7 +10,6 @@ export default function HeroSection({ onNavigate }) {
             <div className="hero-background-glow" />
             <div className="hero-grain" />
 
-            {/* LEFT CONTENT */}
             <div className="hero-copy">
 
                 <h1>
@@ -34,6 +34,14 @@ export default function HeroSection({ onNavigate }) {
                         <ArrowUpRight size={18} />
                     </button>
 
+                    <Link
+                        to="/reservation"
+                        className="hero-reserve-button"
+                    >
+                        <CalendarDays size={17} />
+                        Reserve a Table
+                    </Link>
+
                     <button
                         className="quiet-button"
                         onClick={() => onNavigate('story')}
@@ -46,7 +54,6 @@ export default function HeroSection({ onNavigate }) {
 
             </div>
 
-            {/* RIGHT 3D VISUAL */}
             <div className="hero-visual future-visual">
 
                 <div className="visual-grid" />
@@ -58,29 +65,22 @@ export default function HeroSection({ onNavigate }) {
                 <div className="hero-glow" />
                 <div className="hero-sun" />
 
-                {/* MAIN CAFE IMAGE */}
                 <div className="hero-photo-card">
-
                     <img
                         src={cafe.galleryImage}
                         alt="Triveni Terrace Café"
                     />
-
                 </div>
 
-                {/* FLOATING COFFEE */}
                 <div className="floating-coffee">
-
                     <div className="coffee-image-ring">
                         <img
                             src={cafe.coffeeImage}
                             alt="Coffee at Triveni Terrace Café"
                         />
                     </div>
-
                 </div>
 
-                {/* DECORATIVE 3D ELEMENTS */}
                 <div className="floating-orb orb-one" />
                 <div className="floating-orb orb-two" />
 
