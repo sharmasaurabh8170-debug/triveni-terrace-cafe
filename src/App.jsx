@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Routes, Route } from 'react-router-dom';
 
 import Header from './components/layout/Header.jsx';
 import Footer from './components/layout/Footer.jsx';
@@ -9,13 +10,16 @@ import MenuSection from './components/sections/MenuSection.jsx';
 import TerraceSection from './components/sections/TerraceSection.jsx';
 import VisitSection from './components/sections/VisitSection.jsx';
 
+import Register from './pages/Register.jsx';
+import Login from './pages/Login.jsx';
+
 import './styles/global.css';
 import './styles/responsive.css';
+import './styles/auth.css';
 
-export default function App() {
+function HomePage() {
     const [favourites, setFavourites] = useState([]);
 
-    // Navigate to a page section
     const navigate = (id) => {
         document.getElementById(id)?.scrollIntoView({
             behavior: 'smooth',
@@ -23,7 +27,6 @@ export default function App() {
         });
     };
 
-    // Add a dish to favourites only once
     const addFavourite = (dishName) => {
         setFavourites((current) => {
             if (current.includes(dishName)) {
@@ -36,7 +39,6 @@ export default function App() {
 
     return (
         <div className="site-shell">
-
             <Header
                 cartCount={favourites.length}
                 onNavigate={navigate}
@@ -44,18 +46,23 @@ export default function App() {
 
             <main>
                 <HeroSection onNavigate={navigate} />
-
                 <StorySection onNavigate={navigate} />
-
                 <MenuSection onAddFavourite={addFavourite} />
-
                 <TerraceSection onNavigate={navigate} />
-
                 <VisitSection />
             </main>
 
             <Footer />
-
         </div>
+    );
+}
+
+export default function App() {
+    return (
+        <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/login" element={<Login />} />
+        </Routes>
     );
 }

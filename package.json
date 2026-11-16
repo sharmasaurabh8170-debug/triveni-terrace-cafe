@@ -9,12 +9,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.119.0",
     "@vitejs/plugin-react": "latest",
-    "vite": "latest",
+    "framer-motion": "^11.11.17",
+    "lucide-react": "^0.468.0",
     "react": "latest",
     "react-dom": "latest",
-    "lucide-react": "^0.468.0",
-    "framer-motion": "^11.11.17"
-  },
-  "devDependencies": {}
+    "react-router-dom": "^7.18.5",
+    "vite": "latest"
+  }
 }
