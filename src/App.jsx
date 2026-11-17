@@ -33,7 +33,7 @@ function HomePage() {
         });
     };
 
-    // Add dish to favourites
+    // Add to favourites
     const addFavourite = (dishName) => {
         setFavourites((current) => {
             if (current.includes(dishName)) {
@@ -46,6 +46,8 @@ function HomePage() {
 
     // Add dish to cart
     const addToCart = (dish) => {
+        if (dish.price == null) return;
+
         setCart((currentCart) => {
             const existingItem = currentCart.find(
                 (item) => item.id === dish.id
@@ -54,7 +56,10 @@ function HomePage() {
             if (existingItem) {
                 return currentCart.map((item) =>
                     item.id === dish.id
-                        ? { ...item, quantity: item.quantity + 1 }
+                        ? {
+                            ...item,
+                            quantity: item.quantity + 1
+                        }
                         : item
                 );
             }
@@ -69,7 +74,30 @@ function HomePage() {
         });
     };
 
-    // Calculate total items in cart
+    // Increase or decrease quantity
+    const updateCartQuantity = (dishId, change) => {
+        setCart((currentCart) =>
+            currentCart
+                .map((item) =>
+                    item.id === dishId
+                        ? {
+                            ...item,
+                            quantity: item.quantity + change
+                        }
+                        : item
+                )
+                .filter((item) => item.quantity > 0)
+        );
+    };
+
+    // Remove item from cart
+    const removeFromCart = (dishId) => {
+        setCart((currentCart) =>
+            currentCart.filter((item) => item.id !== dishId)
+        );
+    };
+
+    // Calculate total cart items
     const cartCount = cart.reduce(
         (total, item) => total + item.quantity,
         0
@@ -77,8 +105,12 @@ function HomePage() {
 
     return (
         <div className="site-shell">
+
             <Header
                 cartCount={cartCount}
+                cart={cart}
+                onUpdateCartQuantity={updateCartQuantity}
+                onRemoveFromCart={removeFromCart}
                 onNavigate={navigate}
             />
 
