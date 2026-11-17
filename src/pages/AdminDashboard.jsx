@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 
 import {
@@ -10,7 +10,11 @@ import {
     XCircle,
     LogOut,
     ArrowLeft,
-    PackageCheck
+    PackageCheck,
+    RefreshCw,
+    TrendingUp,
+    Users,
+    IndianRupee
 } from 'lucide-react';
 
 import { supabase } from '../lib/supabaseClient';
@@ -23,25 +27,67 @@ export default function AdminDashboard() {
     const [orders, setOrders] = useState([]);
 
     const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
     const [updatingId, setUpdatingId] = useState(null);
     const [message, setMessage] = useState('');
 
+    // Fetch dashboard data
+    const fetchDashboardData = useCallback(async (showLoader = false) => {
+        if (showLoader) setRefreshing(true);
+
+        const [reservationResult, orderResult] = await Promise.all([
+            supabase
+                .from('reservations')
+                .select('*')
+                .order('created_at', { ascending: false }),
+
+            supabase
+                .from('orders')
+                .select('*, order_items(*)')
+                .order('created_at', { ascending: false })
+        ]);
+
+        if (reservationResult.error) {
+            setMessage(
+                `Reservations: ${reservationResult.error.message}`
+            );
+        } else {
+            setReservations(reservationResult.data || []);
+        }
+
+        if (orderResult.error) {
+            setMessage(previous =>
+                previous
+                    ? `${previous} | Orders: ${orderResult.error.message}`
+                    : `Orders: ${orderResult.error.message}`
+            );
+        } else {
+            setOrders(orderResult.data || []);
+        }
+
+        setRefreshing(false);
+        setLoading(false);
+    }, []);
+
+    // Check admin authentication
     useEffect(() => {
         let active = true;
+        let realtimeChannel = null;
 
-        const loadAdminDashboard = async () => {
+        const initializeDashboard = async () => {
             const {
-                data: { user }
+                data: { user },
+                error: userError
             } = await supabase.auth.getUser();
 
             if (!active) return;
 
-            if (!user) {
+            if (userError || !user) {
                 navigate('/login', { replace: true });
                 return;
             }
 
-            // Check admin permission
+            // Verify admin permission
             const { data: admin, error: adminError } =
                 await supabase
                     .from('admin_users')
@@ -56,64 +102,65 @@ export default function AdminDashboard() {
                 return;
             }
 
-            // Fetch reservations
-            const { data: reservationData, error: reservationError } =
-                await supabase
-                    .from('reservations')
-                    .select('*')
-                    .order('created_at', { ascending: false });
+            await fetchDashboardData();
 
             if (!active) return;
 
-            if (reservationError) {
-                setMessage(reservationError.message);
-            } else {
-                setReservations(reservationData || []);
-            }
+            // Realtime updates
+            realtimeChannel = supabase
+                .channel('admin-dashboard-updates')
 
-            // Fetch all customer orders
-            const { data: orderData, error: orderError } =
-                await supabase
-                    .from('orders')
-                    .select('*, order_items(*)')
-                    .order('created_at', { ascending: false });
+                .on(
+                    'postgres_changes',
+                    {
+                        event: '*',
+                        schema: 'public',
+                        table: 'orders'
+                    },
+                    () => {
+                        fetchDashboardData();
+                    }
+                )
 
-            if (!active) return;
+                .on(
+                    'postgres_changes',
+                    {
+                        event: '*',
+                        schema: 'public',
+                        table: 'reservations'
+                    },
+                    () => {
+                        fetchDashboardData();
+                    }
+                )
 
-            if (orderError) {
-                setMessage(
-                    previous =>
-                        previous
-                            ? `${previous} | Orders: ${orderError.message}`
-                            : `Orders: ${orderError.message}`
-                );
-            } else {
-                setOrders(orderData || []);
-            }
-
-            setLoading(false);
+                .subscribe();
         };
 
-        loadAdminDashboard();
+        initializeDashboard();
 
         return () => {
             active = false;
+
+            if (realtimeChannel) {
+                supabase.removeChannel(realtimeChannel);
+            }
         };
-    }, [navigate]);
+    }, [navigate, fetchDashboardData]);
 
     // Update reservation status
     const updateReservationStatus = async (id, status) => {
         setUpdatingId(id);
         setMessage('');
 
-        const { error } = await supabase
-            .from('reservations')
-            .update({ status })
-            .eq('id', id);
+        try {
+            const { error } = await supabase
+                .from('reservations')
+                .update({ status })
+                .eq('id', id);
 
-        if (error) {
-            setMessage(error.message);
-        } else {
+            if (error) throw error;
+
             setReservations(current =>
                 current.map(item =>
                     item.id === id
@@ -123,9 +170,11 @@ export default function AdminDashboard() {
             );
 
             setMessage(`Reservation ${status} successfully.`);
+        } catch (error) {
+            setMessage(error.message);
+        } finally {
+            setUpdatingId(null);
         }
-
-        setUpdatingId(null);
     };
 
     // Update food order status
@@ -133,14 +182,14 @@ export default function AdminDashboard() {
         setUpdatingId(id);
         setMessage('');
 
-        const { error } = await supabase
-            .from('orders')
-            .update({ status })
-            .eq('id', id);
+        try {
+            const { error } = await supabase
+                .from('orders')
+                .update({ status })
+                .eq('id', id);
 
-        if (error) {
-            setMessage(error.message);
-        } else {
+            if (error) throw error;
+
             setOrders(current =>
                 current.map(order =>
                     order.id === id
@@ -150,20 +199,24 @@ export default function AdminDashboard() {
             );
 
             setMessage(`Order ${status} successfully.`);
+        } catch (error) {
+            setMessage(error.message);
+        } finally {
+            setUpdatingId(null);
         }
-
-        setUpdatingId(null);
     };
 
+    // Logout
     const handleLogout = async () => {
         await supabase.auth.signOut();
         navigate('/login', { replace: true });
     };
 
+    // Format date
     const formatDate = date => {
         return new Date(date).toLocaleString('en-IN', {
             day: 'numeric',
-            month: 'long',
+            month: 'short',
             year: 'numeric',
             hour: '2-digit',
             minute: '2-digit'
@@ -179,21 +232,46 @@ export default function AdminDashboard() {
     }
 
     // Reservation statistics
-    const pendingReservations =
-        reservations.filter(r => r.status === 'pending').length;
+    const pendingReservations = reservations.filter(
+        r => r.status === 'pending'
+    ).length;
 
-    const confirmedReservations =
-        reservations.filter(r => r.status === 'confirmed').length;
+    const confirmedReservations = reservations.filter(
+        r => r.status === 'confirmed'
+    ).length;
 
-    const cancelledReservations =
-        reservations.filter(r => r.status === 'cancelled').length;
+    const cancelledReservations = reservations.filter(
+        r => r.status === 'cancelled'
+    ).length;
 
     // Order statistics
-    const pendingOrders =
-        orders.filter(o => o.status === 'pending').length;
+    const pendingOrders = orders.filter(
+        o => o.status === 'pending'
+    ).length;
 
-    const completedOrders =
-        orders.filter(o => o.status === 'completed').length;
+    const confirmedOrders = orders.filter(
+        o => o.status === 'confirmed'
+    ).length;
+
+    const completedOrders = orders.filter(
+        o => o.status === 'completed'
+    ).length;
+
+    const cancelledOrders = orders.filter(
+        o => o.status === 'cancelled'
+    ).length;
+
+    // Revenue from completed orders
+    const totalRevenue = orders
+        .filter(order => order.status === 'completed')
+        .reduce(
+            (total, order) => total + Number(order.total_amount || 0),
+            0
+        );
+
+    // Recent activity
+    const recentOrders = orders.slice(0, 5);
+    const recentReservations = reservations.slice(0, 5);
 
     return (
         <div className="dashboard-page">
@@ -205,13 +283,29 @@ export default function AdminDashboard() {
                     TRIVENI TERRACE CAFÉ
                 </Link>
 
-                <button
-                    className="dashboard-logout"
-                    onClick={handleLogout}
-                >
-                    <LogOut size={17} />
-                    Logout
-                </button>
+                <div className="admin-header-actions">
+
+                    <button
+                        className="admin-refresh-button"
+                        onClick={() => fetchDashboardData(true)}
+                        disabled={refreshing}
+                    >
+                        <RefreshCw
+                            size={17}
+                            className={refreshing ? 'refresh-spinning' : ''}
+                        />
+                        {refreshing ? 'Refreshing...' : 'Refresh'}
+                    </button>
+
+                    <button
+                        className="dashboard-logout"
+                        onClick={handleLogout}
+                    >
+                        <LogOut size={17} />
+                        Logout
+                    </button>
+
+                </div>
 
             </header>
 
@@ -230,65 +324,217 @@ export default function AdminDashboard() {
                     <h1>Admin Dashboard</h1>
 
                     <p>
-                        Manage customer reservations and food orders.
+                        Monitor café performance and manage your daily operations.
                     </p>
 
                 </section>
 
+                {/* Message */}
                 {message && (
-                    <p className="auth-message">
-                        {message}
-                    </p>
+                    <div className="admin-dashboard-message">
+                        <p>{message}</p>
+
+                        <button
+                            onClick={() => setMessage('')}
+                            aria-label="Dismiss message"
+                        >
+                            ×
+                        </button>
+                    </div>
                 )}
 
-                {/* Statistics */}
-                <section className="admin-stats">
+                {/* Main Analytics */}
+                <section className="admin-section">
 
-                    <div className="admin-stat-card">
-                        <LayoutDashboard size={24} />
-                        <span>Total Reservations</span>
-                        <h2>{reservations.length}</h2>
+                    <div className="admin-section-heading">
+                        <div>
+                            <span>OVERVIEW</span>
+                            <h2>Business Analytics</h2>
+                        </div>
                     </div>
 
-                    <div className="admin-stat-card">
-                        <Clock size={24} />
-                        <span>Pending Reservations</span>
-                        <h2>{pendingReservations}</h2>
-                    </div>
+                    <div className="admin-stats">
 
-                    <div className="admin-stat-card">
-                        <CheckCircle size={24} />
-                        <span>Confirmed Reservations</span>
-                        <h2>{confirmedReservations}</h2>
-                    </div>
+                        <div className="admin-stat-card">
+                            <ShoppingBag size={25} />
+                            <span>Total Orders</span>
+                            <h2>{orders.length}</h2>
+                        </div>
 
-                    <div className="admin-stat-card">
-                        <XCircle size={24} />
-                        <span>Cancelled Reservations</span>
-                        <h2>{cancelledReservations}</h2>
+                        <div className="admin-stat-card">
+                            <Clock size={25} />
+                            <span>Pending Orders</span>
+                            <h2>{pendingOrders}</h2>
+                        </div>
+
+                        <div className="admin-stat-card">
+                            <CheckCircle size={25} />
+                            <span>Confirmed Orders</span>
+                            <h2>{confirmedOrders}</h2>
+                        </div>
+
+                        <div className="admin-stat-card">
+                            <PackageCheck size={25} />
+                            <span>Completed Orders</span>
+                            <h2>{completedOrders}</h2>
+                        </div>
+
+                        <div className="admin-stat-card">
+                            <IndianRupee size={25} />
+                            <span>Completed Order Revenue</span>
+                            <h2>₹{totalRevenue.toLocaleString('en-IN')}</h2>
+                        </div>
+
                     </div>
 
                 </section>
 
-                {/* Order Statistics */}
-                <section className="admin-stats">
+                {/* Reservation Analytics */}
+                <section className="admin-section">
 
-                    <div className="admin-stat-card">
-                        <ShoppingBag size={24} />
-                        <span>Total Orders</span>
-                        <h2>{orders.length}</h2>
+                    <div className="admin-section-heading">
+                        <div>
+                            <span>TABLE BOOKINGS</span>
+                            <h2>Reservation Analytics</h2>
+                        </div>
                     </div>
 
-                    <div className="admin-stat-card">
-                        <Clock size={24} />
-                        <span>Pending Orders</span>
-                        <h2>{pendingOrders}</h2>
+                    <div className="admin-stats">
+
+                        <div className="admin-stat-card">
+                            <CalendarDays size={25} />
+                            <span>Total Reservations</span>
+                            <h2>{reservations.length}</h2>
+                        </div>
+
+                        <div className="admin-stat-card">
+                            <Clock size={25} />
+                            <span>Pending Reservations</span>
+                            <h2>{pendingReservations}</h2>
+                        </div>
+
+                        <div className="admin-stat-card">
+                            <CheckCircle size={25} />
+                            <span>Confirmed Reservations</span>
+                            <h2>{confirmedReservations}</h2>
+                        </div>
+
+                        <div className="admin-stat-card">
+                            <XCircle size={25} />
+                            <span>Cancelled Reservations</span>
+                            <h2>{cancelledReservations}</h2>
+                        </div>
+
                     </div>
 
-                    <div className="admin-stat-card">
-                        <PackageCheck size={24} />
-                        <span>Completed Orders</span>
-                        <h2>{completedOrders}</h2>
+                </section>
+
+                {/* Recent Activity */}
+                <section className="admin-section">
+
+                    <div className="admin-section-heading">
+                        <div>
+                            <span>LATEST UPDATES</span>
+                            <h2>Recent Activity</h2>
+                        </div>
+                    </div>
+
+                    <div className="admin-recent-grid">
+
+                        {/* Recent Orders */}
+                        <div className="admin-recent-card">
+
+                            <h3>
+                                <ShoppingBag size={20} />
+                                Recent Orders
+                            </h3>
+
+                            {recentOrders.length === 0 ? (
+                                <p className="admin-no-data">
+                                    No recent orders.
+                                </p>
+                            ) : (
+                                recentOrders.map(order => (
+                                    <div
+                                        className="admin-recent-item"
+                                        key={order.id}
+                                    >
+
+                                        <div>
+                                            <strong>
+                                                {order.full_name}
+                                            </strong>
+
+                                            <p>
+                                                #{order.id.slice(0, 8)}
+                                            </p>
+
+                                            <small>
+                                                {formatDate(order.created_at)}
+                                            </small>
+                                        </div>
+
+                                        <div className="admin-recent-right">
+
+                                            <strong>
+                                                ₹{Number(order.total_amount).toFixed(2)}
+                                            </strong>
+
+                                            <span className={`order-status ${order.status}`}>
+                                                {order.status}
+                                            </span>
+
+                                        </div>
+
+                                    </div>
+                                ))
+                            )}
+
+                        </div>
+
+                        {/* Recent Reservations */}
+                        <div className="admin-recent-card">
+
+                            <h3>
+                                <CalendarDays size={20} />
+                                Recent Reservations
+                            </h3>
+
+                            {recentReservations.length === 0 ? (
+                                <p className="admin-no-data">
+                                    No recent reservations.
+                                </p>
+                            ) : (
+                                recentReservations.map(booking => (
+                                    <div
+                                        className="admin-recent-item"
+                                        key={booking.id}
+                                    >
+
+                                        <div>
+                                            <strong>
+                                                {booking.full_name}
+                                            </strong>
+
+                                            <p>
+                                                {booking.guests} Guest(s)
+                                            </p>
+
+                                            <small>
+                                                {booking.reservation_date}
+                                            </small>
+                                        </div>
+
+                                        <span className={`booking-status ${booking.status}`}>
+                                            {booking.status}
+                                        </span>
+
+                                    </div>
+                                ))
+                            )}
+
+                        </div>
+
                     </div>
 
                 </section>
@@ -322,21 +568,13 @@ export default function AdminDashboard() {
 
                                         <p>{booking.email}</p>
 
-                                        <p>
-                                            Phone: {booking.phone}
-                                        </p>
+                                        <p>Phone: {booking.phone}</p>
 
-                                        <p>
-                                            Date: {booking.reservation_date}
-                                        </p>
+                                        <p>Date: {booking.reservation_date}</p>
 
-                                        <p>
-                                            Time: {booking.reservation_time}
-                                        </p>
+                                        <p>Time: {booking.reservation_time}</p>
 
-                                        <p>
-                                            Guests: {booking.guests}
-                                        </p>
+                                        <p>Guests: {booking.guests}</p>
 
                                         {booking.special_request && (
                                             <p>
@@ -354,6 +592,7 @@ export default function AdminDashboard() {
 
                                         {booking.status === 'pending' && (
                                             <>
+
                                                 <button
                                                     disabled={updatingId === booking.id}
                                                     onClick={() =>
@@ -379,6 +618,7 @@ export default function AdminDashboard() {
                                                 >
                                                     Cancel
                                                 </button>
+
                                             </>
                                         )}
 
@@ -410,7 +650,6 @@ export default function AdminDashboard() {
                             <p>
                                 No food orders have been placed yet.
                             </p>
-
                         </div>
 
                     ) : (
@@ -424,7 +663,7 @@ export default function AdminDashboard() {
                                     key={order.id}
                                 >
 
-                                    {/* Customer information */}
+                                    {/* Order Header */}
                                     <div className="admin-order-top">
 
                                         <div>
@@ -447,21 +686,16 @@ export default function AdminDashboard() {
 
                                     </div>
 
+                                    {/* Customer Information */}
                                     <div className="admin-order-customer">
 
                                         <h4>Customer Details</h4>
 
-                                        <p>
-                                            Name: {order.full_name}
-                                        </p>
+                                        <p>Name: {order.full_name}</p>
 
-                                        <p>
-                                            Phone: {order.phone}
-                                        </p>
+                                        <p>Phone: {order.phone}</p>
 
-                                        <p>
-                                            Order Type: {order.order_type}
-                                        </p>
+                                        <p>Order Type: {order.order_type}</p>
 
                                         {order.delivery_address && (
                                             <p>
@@ -471,7 +705,7 @@ export default function AdminDashboard() {
 
                                     </div>
 
-                                    {/* Food items */}
+                                    {/* Food Items */}
                                     <div className="admin-order-items">
 
                                         <h4>Ordered Items</h4>
@@ -500,9 +734,7 @@ export default function AdminDashboard() {
                                     {/* Total */}
                                     <div className="admin-order-total">
 
-                                        <strong>
-                                            Total Amount
-                                        </strong>
+                                        <strong>Total Amount</strong>
 
                                         <strong>
                                             ₹{Number(order.total_amount).toFixed(2)}
@@ -510,7 +742,7 @@ export default function AdminDashboard() {
 
                                     </div>
 
-                                    {/* Status controls */}
+                                    {/* Status Controls */}
                                     <div className="admin-order-controls">
 
                                         <label>
