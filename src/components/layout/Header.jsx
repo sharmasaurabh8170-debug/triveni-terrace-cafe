@@ -22,7 +22,7 @@ import '../../styles/header.css';
 
 export default function Header({
     cartCount,
-    cart,
+    cart = [],
     onUpdateCartQuantity,
     onRemoveFromCart,
     onNavigate
@@ -65,10 +65,25 @@ export default function Header({
         routerNavigate('/');
     };
 
+    // Calculate cart total
     const cartTotal = cart.reduce(
         (total, item) => total + item.price * item.quantity,
         0
     );
+
+    // Proceed to checkout
+    const handleCheckout = () => {
+        if (cart.length === 0) {
+            alert('Your cart is empty!');
+            return;
+        }
+
+        setCartOpen(false);
+
+        routerNavigate('/checkout', {
+            state: { cart }
+        });
+    };
 
     return (
         <header className="header">
@@ -139,6 +154,7 @@ export default function Header({
                     <span>{cartCount}</span>
                 </button>
 
+                {/* Reservation */}
                 <Link
                     to="/reservation"
                     className="reserve-button"
@@ -147,6 +163,7 @@ export default function Header({
                     Reserve a Table
                 </Link>
 
+                {/* Find Café */}
                 <button
                     className="book-button"
                     onClick={() => navigate('visit')}
@@ -225,6 +242,7 @@ export default function Header({
                     </div>
 
                     {cart.length === 0 ? (
+
                         <div className="empty-cart">
                             <ShoppingBag size={35} />
                             <p>Your cart is empty.</p>
@@ -239,7 +257,9 @@ export default function Header({
                                 Explore Menu
                             </button>
                         </div>
+
                     ) : (
+
                         <>
                             <div className="cart-items">
 
@@ -254,6 +274,7 @@ export default function Header({
                                         />
 
                                         <div className="cart-item-info">
+
                                             <h4>{item.name}</h4>
 
                                             <p>
@@ -308,20 +329,20 @@ export default function Header({
 
                             </div>
 
+                            {/* Cart Total */}
                             <div className="cart-total">
                                 <span>Total Amount</span>
                                 <strong>₹{cartTotal}</strong>
                             </div>
 
+                            {/* Checkout Button */}
                             <button
                                 className="checkout-button"
-                                onClick={() => {
-                                    setCartOpen(false);
-                                    alert('Checkout will be added in the next step.');
-                                }}
+                                onClick={handleCheckout}
                             >
                                 Proceed to Checkout
                             </button>
+
                         </>
                     )}
 
