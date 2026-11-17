@@ -92,3 +92,40 @@
         transform: none !important;
     }
 }
+.dish-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.dish-actions .add-button {
+    width: 100%;
+}
+
+.cart-add-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 12px;
+    background: #294b35;
+    color: white;
+    border: 1px solid #294b35;
+    border-radius: 5px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.cart-add-button:hover:not(:disabled) {
+    background: #1d3928;
+}
+
+.cart-add-button:disabled {
+    background: #999;
+    border-color: #999;
+    cursor: not-allowed;
+}

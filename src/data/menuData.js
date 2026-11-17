@@ -43,16 +43,6 @@ export const dishes = [
         imageNote: 'Representative photo'
     },
 
-    {
-        id: 'aloo-tikki-chaat',
-        name: 'Aloo Tikki Chaat',
-        price: 200,
-        category: 'STREET TREATS',
-        description: 'Crisp potato tikki with chana, dahi & chutneys',
-        image: 'https://imgmediagumlet.lbb.in/media/2019/08/5d62f50332d4fc66558fb5b9_1566766339672.jpg',
-        alt: 'Aloo tikki chaat',
-        imageNote: 'Food listing photo'
-    },
 
     {
         id: 'filter-coffee',

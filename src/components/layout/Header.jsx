@@ -4,7 +4,10 @@ import {
     X,
     ShoppingBag,
     UserRound,
-    LogOut
+    LogOut,
+    Plus,
+    Minus,
+    Trash2
 } from 'lucide-react';
 
 import { useEffect, useState } from 'react';
@@ -17,10 +20,17 @@ import { navItems } from '../../data/siteData';
 
 import '../../styles/header.css';
 
-export default function Header({ cartCount, onNavigate }) {
+export default function Header({
+    cartCount,
+    cart,
+    onUpdateCartQuantity,
+    onRemoveFromCart,
+    onNavigate
+}) {
     const [menuOpen, setMenuOpen] = useState(false);
     const [user, setUser] = useState(null);
     const [profileOpen, setProfileOpen] = useState(false);
+    const [cartOpen, setCartOpen] = useState(false);
 
     const routerNavigate = useNavigate();
 
@@ -54,6 +64,11 @@ export default function Header({ cartCount, onNavigate }) {
         setProfileOpen(false);
         routerNavigate('/');
     };
+
+    const cartTotal = cart.reduce(
+        (total, item) => total + item.price * item.quantity,
+        0
+    );
 
     return (
         <header className="header">
@@ -113,26 +128,31 @@ export default function Header({ cartCount, onNavigate }) {
             {/* Header Actions */}
             <div className="header-actions">
 
+                {/* Shopping Cart */}
                 <button
                     className="cart-button"
-                    onClick={() => navigate('menu')}
-                    aria-label={`Menu, ${cartCount} favourites`}
+                    onClick={() => setCartOpen(!cartOpen)}
+                    aria-label={`Shopping cart with ${cartCount} items`}
+                    aria-expanded={cartOpen}
                 >
                     <ShoppingBag size={20} />
                     <span>{cartCount}</span>
                 </button>
 
                 <Link
-    to="/reservation"
-    className="reserve-button"
-    onClick={() => setMenuOpen(false)}
->
-    Reserve a Table
-</Link>
+                    to="/reservation"
+                    className="reserve-button"
+                    onClick={() => setMenuOpen(false)}
+                >
+                    Reserve a Table
+                </Link>
 
-<button className="book-button" onClick={() => navigate('visit')}>
-    Find the café <ArrowUpRight size={18}/>
-</button>
+                <button
+                    className="book-button"
+                    onClick={() => navigate('visit')}
+                >
+                    Find the café <ArrowUpRight size={18} />
+                </button>
 
                 {/* Profile */}
                 {user && (
@@ -188,6 +208,126 @@ export default function Header({ cartCount, onNavigate }) {
                 </button>
 
             </div>
+
+            {/* Shopping Cart Panel */}
+            {cartOpen && (
+                <div className="cart-panel">
+
+                    <div className="cart-panel-header">
+                        <h3>Your Shopping Cart</h3>
+
+                        <button
+                            onClick={() => setCartOpen(false)}
+                            aria-label="Close cart"
+                        >
+                            <X size={21} />
+                        </button>
+                    </div>
+
+                    {cart.length === 0 ? (
+                        <div className="empty-cart">
+                            <ShoppingBag size={35} />
+                            <p>Your cart is empty.</p>
+                            <span>Add something delicious!</span>
+
+                            <button
+                                onClick={() => {
+                                    setCartOpen(false);
+                                    navigate('menu');
+                                }}
+                            >
+                                Explore Menu
+                            </button>
+                        </div>
+                    ) : (
+                        <>
+                            <div className="cart-items">
+
+                                {cart.map((item) => (
+                                    <div
+                                        className="cart-item"
+                                        key={item.id}
+                                    >
+                                        <img
+                                            src={item.image}
+                                            alt={item.name}
+                                        />
+
+                                        <div className="cart-item-info">
+                                            <h4>{item.name}</h4>
+
+                                            <p>
+                                                ₹{item.price * item.quantity}
+                                            </p>
+
+                                            <div className="cart-quantity">
+
+                                                <button
+                                                    onClick={() =>
+                                                        onUpdateCartQuantity(
+                                                            item.id,
+                                                            -1
+                                                        )
+                                                    }
+                                                    aria-label={`Decrease ${item.name} quantity`}
+                                                >
+                                                    <Minus size={14} />
+                                                </button>
+
+                                                <span>
+                                                    {item.quantity}
+                                                </span>
+
+                                                <button
+                                                    onClick={() =>
+                                                        onUpdateCartQuantity(
+                                                            item.id,
+                                                            1
+                                                        )
+                                                    }
+                                                    aria-label={`Increase ${item.name} quantity`}
+                                                >
+                                                    <Plus size={14} />
+                                                </button>
+
+                                            </div>
+                                        </div>
+
+                                        <button
+                                            className="cart-remove"
+                                            onClick={() =>
+                                                onRemoveFromCart(item.id)
+                                            }
+                                            aria-label={`Remove ${item.name}`}
+                                        >
+                                            <Trash2 size={17} />
+                                        </button>
+
+                                    </div>
+                                ))}
+
+                            </div>
+
+                            <div className="cart-total">
+                                <span>Total Amount</span>
+                                <strong>₹{cartTotal}</strong>
+                            </div>
+
+                            <button
+                                className="checkout-button"
+                                onClick={() => {
+                                    setCartOpen(false);
+                                    alert('Checkout will be added in the next step.');
+                                }}
+                            >
+                                Proceed to Checkout
+                            </button>
+                        </>
+                    )}
+
+                </div>
+            )}
+
         </header>
     );
 }

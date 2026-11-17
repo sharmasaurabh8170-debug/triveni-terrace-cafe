@@ -7,9 +7,10 @@ import {
 
 import { dishes } from '../../data/menuData';
 import { useRef } from 'react';
+import { ShoppingCart } from 'lucide-react';
 import '../../styles/menu.css';
 
-function DishCard({ dish, onAddFavourite }) {
+function DishCard({ dish, onAddFavourite, onAddToCart }) {
     const cardRef = useRef(null);
 
     const mouseX = useMotionValue(0);
@@ -89,18 +90,32 @@ function DishCard({ dish, onAddFavourite }) {
 
             <p>{dish.description}</p>
 
-            <button
-                className="add-button"
-                onClick={() => onAddFavourite(dish.name)}
-            >
-                Add to favourites
-                <span>＋</span>
-            </button>
+            <div className="dish-actions">
+                <button
+                    className="add-button"
+                    onClick={() => onAddFavourite(dish.name)}
+                >
+                    Add to favourites
+                    <span>＋</span>
+                </button>
+
+                <button
+                    className="cart-add-button"
+                    onClick={() => onAddToCart(dish)}
+                    disabled={dish.price == null}
+                >
+                    <ShoppingCart size={16} />
+                    {dish.price == null ? 'Unavailable' : 'Add to Cart'}
+                </button>
+            </div>
         </motion.article>
     );
 }
 
-export default function MenuSection({ onAddFavourite }) {
+export default function MenuSection({
+    onAddFavourite,
+    onAddToCart
+}) {
     return (
         <section
             className="menu-section section-pad"
@@ -116,6 +131,7 @@ export default function MenuSection({ onAddFavourite }) {
                         key={dish.id}
                         dish={dish}
                         onAddFavourite={onAddFavourite}
+                        onAddToCart={onAddToCart}
                     />
                 ))}
             </div>

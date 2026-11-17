@@ -24,6 +24,7 @@ import './styles/auth.css';
 
 function HomePage() {
     const [favourites, setFavourites] = useState([]);
+    const [cart, setCart] = useState([]);
 
     const navigate = (id) => {
         document.getElementById(id)?.scrollIntoView({
@@ -32,6 +33,7 @@ function HomePage() {
         });
     };
 
+    // Add dish to favourites
     const addFavourite = (dishName) => {
         setFavourites((current) => {
             if (current.includes(dishName)) {
@@ -42,18 +44,56 @@ function HomePage() {
         });
     };
 
+    // Add dish to cart
+    const addToCart = (dish) => {
+        setCart((currentCart) => {
+            const existingItem = currentCart.find(
+                (item) => item.id === dish.id
+            );
+
+            if (existingItem) {
+                return currentCart.map((item) =>
+                    item.id === dish.id
+                        ? { ...item, quantity: item.quantity + 1 }
+                        : item
+                );
+            }
+
+            return [
+                ...currentCart,
+                {
+                    ...dish,
+                    quantity: 1
+                }
+            ];
+        });
+    };
+
+    // Calculate total items in cart
+    const cartCount = cart.reduce(
+        (total, item) => total + item.quantity,
+        0
+    );
+
     return (
         <div className="site-shell">
             <Header
-                cartCount={favourites.length}
+                cartCount={cartCount}
                 onNavigate={navigate}
             />
 
             <main>
                 <HeroSection onNavigate={navigate} />
+
                 <StorySection onNavigate={navigate} />
-                <MenuSection onAddFavourite={addFavourite} />
+
+                <MenuSection
+                    onAddFavourite={addFavourite}
+                    onAddToCart={addToCart}
+                />
+
                 <TerraceSection onNavigate={navigate} />
+
                 <VisitSection />
             </main>
 
@@ -73,8 +113,6 @@ export default function App() {
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/reservation" element={<Reservation />} />
             <Route path="/admin" element={<AdminDashboard />} />
-
-            
         </Routes>
     );
 }
