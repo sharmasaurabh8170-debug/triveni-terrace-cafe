@@ -7,10 +7,15 @@ import {
 
 import { dishes } from '../../data/menuData';
 import { useRef } from 'react';
-import { ShoppingCart } from 'lucide-react';
+import { ShoppingCart, Heart, Check } from 'lucide-react';
 import '../../styles/menu.css';
 
-function DishCard({ dish, onAddFavourite, onAddToCart }) {
+function DishCard({
+    dish,
+    favorites,
+    onAddFavourite,
+    onAddToCart
+}) {
     const cardRef = useRef(null);
 
     const mouseX = useMotionValue(0);
@@ -31,6 +36,8 @@ function DishCard({ dish, onAddFavourite, onAddToCart }) {
         useTransform(mouseX, [-0.5, 0.5], [-7, 7]),
         springConfig
     );
+
+    const isFavourite = favorites.includes(dish.name);
 
     const handleMouseMove = (event) => {
         if (!cardRef.current) return;
@@ -91,12 +98,23 @@ function DishCard({ dish, onAddFavourite, onAddToCart }) {
             <p>{dish.description}</p>
 
             <div className="dish-actions">
+
                 <button
-                    className="add-button"
+                    className={`add-button ${isFavourite ? 'is-favourite' : ''}`}
                     onClick={() => onAddFavourite(dish.name)}
+                    disabled={isFavourite}
                 >
-                    Add to favourites
-                    <span>＋</span>
+                    {isFavourite ? (
+                        <>
+                            <Check size={16} />
+                            Added to Favourites
+                        </>
+                    ) : (
+                        <>
+                            <Heart size={16} />
+                            Add to Favourites
+                        </>
+                    )}
                 </button>
 
                 <button
@@ -105,14 +123,19 @@ function DishCard({ dish, onAddFavourite, onAddToCart }) {
                     disabled={dish.price == null}
                 >
                     <ShoppingCart size={16} />
-                    {dish.price == null ? 'Unavailable' : 'Add to Cart'}
+
+                    {dish.price == null
+                        ? 'Unavailable'
+                        : 'Add to Cart'}
                 </button>
+
             </div>
         </motion.article>
     );
 }
 
 export default function MenuSection({
+    favorites = [],
     onAddFavourite,
     onAddToCart
 }) {
@@ -130,6 +153,7 @@ export default function MenuSection({
                     <DishCard
                         key={dish.id}
                         dish={dish}
+                        favorites={favorites}
                         onAddFavourite={onAddFavourite}
                         onAddToCart={onAddToCart}
                     />

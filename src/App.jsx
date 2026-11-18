@@ -24,9 +24,10 @@ import './styles/responsive.css';
 import './styles/auth.css';
 
 function HomePage() {
-    const [favourites, setFavourites] = useState([]);
+    const [favorites, setFavorites] = useState([]);
     const [cart, setCart] = useState([]);
 
+    // Navigate to a section on the homepage
     const navigate = (id) => {
         document.getElementById(id)?.scrollIntoView({
             behavior: 'smooth',
@@ -34,9 +35,9 @@ function HomePage() {
         });
     };
 
-    // Add to favourites
+    // Add a dish to favourites
     const addFavourite = (dishName) => {
-        setFavourites((current) => {
+        setFavorites((current) => {
             if (current.includes(dishName)) {
                 return current;
             }
@@ -45,7 +46,14 @@ function HomePage() {
         });
     };
 
-    // Add dish to cart
+    // Remove a dish from favourites
+    const removeFavourite = (dishName) => {
+        setFavorites((current) =>
+            current.filter((item) => item !== dishName)
+        );
+    };
+
+    // Add a dish to cart
     const addToCart = (dish) => {
         if (dish.price == null) return;
 
@@ -75,7 +83,7 @@ function HomePage() {
         });
     };
 
-    // Increase or decrease quantity
+    // Increase or decrease cart quantity
     const updateCartQuantity = (dishId, change) => {
         setCart((currentCart) =>
             currentCart
@@ -91,14 +99,14 @@ function HomePage() {
         );
     };
 
-    // Remove item from cart
+    // Remove a dish from cart
     const removeFromCart = (dishId) => {
         setCart((currentCart) =>
             currentCart.filter((item) => item.id !== dishId)
         );
     };
 
-    // Calculate total cart items
+    // Calculate total number of cart items
     const cartCount = cart.reduce(
         (total, item) => total + item.quantity,
         0
@@ -113,6 +121,8 @@ function HomePage() {
                 onUpdateCartQuantity={updateCartQuantity}
                 onRemoveFromCart={removeFromCart}
                 onNavigate={navigate}
+                favorites={favorites}
+                onRemoveFavorite={removeFavourite}
             />
 
             <main>
@@ -147,7 +157,6 @@ export default function App() {
             <Route path="/reservation" element={<Reservation />} />
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/checkout" element={<Checkout />} />
-            
         </Routes>
     );
 }

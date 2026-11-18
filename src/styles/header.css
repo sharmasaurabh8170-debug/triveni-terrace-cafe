@@ -408,3 +408,89 @@
         font-size: 12px;
     }
 }
+
+/* Header favourites, notifications and saved items */
+
+
+.header-favorites-button {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border: 1px solid rgba(65, 94, 68, .2);
+    border-radius: 50%;
+    background: #fff;
+    color: #365b42;
+    cursor: pointer;
+}
+.header-favorites-button > span,
+.cart-button > span {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    display: grid;
+    place-items: center;
+    border-radius: 999px;
+    background: #315b43;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+}
+.favorites-panel { right: 72px; }
+.favorite-remove-button {
+    border: 0;
+    padding: 5px 0;
+    background: transparent;
+    color: #9a5b4c;
+    font-size: 11px;
+    cursor: pointer;
+}
+.cafe-toast {
+    position: absolute;
+    z-index: 1200;
+    top: calc(100% + 14px);
+    right: 22px;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    width: min(360px, calc(100vw - 32px));
+    padding: 14px 15px;
+    border: 1px solid #dce7d8;
+    border-radius: 14px;
+    background: #fffefa;
+    box-shadow: 0 14px 38px rgba(32, 54, 38, .16);
+    color: #36533e;
+    animation: cafe-toast-in .22s ease-out;
+}
+.cafe-toast-icon {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: #eaf2e6;
+    color: #3f704b;
+}
+.cafe-toast-copy { display: grid; gap: 3px; flex: 1; }
+.cafe-toast-copy strong { font-size: 13px; }
+.cafe-toast-copy small { color: #7c877b; font-size: 11px; line-height: 1.4; }
+.cafe-toast > button {
+    border: 0;
+    background: transparent;
+    color: #7b877b;
+    cursor: pointer;
+}
+@keyframes cafe-toast-in {
+    from { opacity: 0; transform: translateY(-7px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@media (max-width: 760px) {
+    .favorites-panel { right: 10px; }
+    .cafe-toast { right: 10px; }
+}
