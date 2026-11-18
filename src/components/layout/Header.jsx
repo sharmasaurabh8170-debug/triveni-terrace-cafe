@@ -10,7 +10,7 @@ import {
     Trash2,
     Heart,
     CheckCircle,
-    ShoppingCart
+    ShieldCheck
 } from 'lucide-react';
 
 import { useEffect, useRef, useState } from 'react';
@@ -33,89 +33,181 @@ export default function Header({
 }) {
     const [menuOpen, setMenuOpen] = useState(false);
     const [user, setUser] = useState(null);
+    const [isAdmin, setIsAdmin] = useState(false);
     const [profileOpen, setProfileOpen] = useState(false);
     const [cartOpen, setCartOpen] = useState(false);
     const [favoritesOpen, setFavoritesOpen] = useState(false);
     const [toast, setToast] = useState(null);
 
     const routerNavigate = useNavigate();
+
     const previousCartCount = useRef(Number(cartCount) || 0);
     const previousFavoritesCount = useRef(favorites.length);
     const toastTimer = useRef(null);
 
+    // Check whether the logged-in user is an administrator.
+    const checkAdminStatus = async (userId) => {
+        if (!userId) {
+            setIsAdmin(false);
+            return;
+        }
+
+        const { data, error } = await supabase
+            .from('admin_users')
+            .select('user_id')
+            .eq('user_id', userId)
+            .maybeSingle();
+
+        if (error) {
+            console.error('Admin permission check failed:', error.message);
+            setIsAdmin(false);
+            return;
+        }
+
+        setIsAdmin(Boolean(data));
+    };
+
+    // Check authentication and admin permissions.
     useEffect(() => {
-        supabase.auth.getSession().then(({ data }) => {
-            setUser(data.session?.user ?? null);
-        });
+        let active = true;
+
+        const loadSession = async () => {
+            const { data, error } = await supabase.auth.getSession();
+
+            if (error) {
+                console.error('Session error:', error.message);
+                return;
+            }
+
+            if (!active) return;
+
+            const currentUser = data.session?.user ?? null;
+
+            setUser(currentUser);
+
+            if (currentUser) {
+                await checkAdminStatus(currentUser.id);
+            }
+        };
+
+        loadSession();
 
         const {
             data: { subscription }
         } = supabase.auth.onAuthStateChange((_event, session) => {
-            setUser(session?.user ?? null);
+            const currentUser = session?.user ?? null;
+
+            setUser(currentUser);
+            setIsAdmin(false);
+
+            if (currentUser) {
+                // Run the database check after the auth callback.
+                setTimeout(() => {
+                    if (active) {
+                        checkAdminStatus(currentUser.id);
+                    }
+                }, 0);
+            }
         });
 
         return () => {
+            active = false;
             subscription.unsubscribe();
-            if (toastTimer.current) clearTimeout(toastTimer.current);
+
+            if (toastTimer.current) {
+                clearTimeout(toastTimer.current);
+            }
         };
     }, []);
 
-    // Show a small notification when the cart quantity increases.
+    // Display notification when cart quantity increases.
     useEffect(() => {
         const currentCount = Number(cartCount) || 0;
+
         if (currentCount > previousCartCount.current) {
-            showToast('Added to your cart', 'Your selection is in the shopping cart.');
+            showToast(
+                'Added to your cart',
+                'Your selection is in the shopping cart.'
+            );
         }
+
         previousCartCount.current = currentCount;
     }, [cartCount]);
 
-    // Show a notification when a favourite is added.
+    // Display notification when a favourite is added.
     useEffect(() => {
         if (favorites.length > previousFavoritesCount.current) {
-            showToast('Added to favourites', 'You can find it in your saved favourites.');
+            showToast(
+                'Added to favourites',
+                'You can find it in your saved favourites.'
+            );
         }
+
         previousFavoritesCount.current = favorites.length;
     }, [favorites.length]);
 
     const showToast = (title, description) => {
         setToast({ title, description });
-        if (toastTimer.current) clearTimeout(toastTimer.current);
-        toastTimer.current = setTimeout(() => setToast(null), 3200);
+
+        if (toastTimer.current) {
+            clearTimeout(toastTimer.current);
+        }
+
+        toastTimer.current = setTimeout(() => {
+            setToast(null);
+        }, 3200);
     };
 
     const navigate = (id) => {
         if (onNavigate) onNavigate(id);
+
         setMenuOpen(false);
         setCartOpen(false);
         setFavoritesOpen(false);
     };
 
+    // Logout
     const handleLogout = async () => {
         const { error } = await supabase.auth.signOut();
+
         if (error) {
             showToast('Could not log out', error.message);
             return;
         }
+
         setProfileOpen(false);
+        setIsAdmin(false);
         routerNavigate('/');
     };
 
+    // Cart total
     const cartTotal = cart.reduce(
-        (total, item) => total + (Number(item.price) || 0) * item.quantity,
+        (total, item) =>
+            total + (Number(item.price) || 0) * item.quantity,
         0
     );
 
+    // Checkout
     const handleCheckout = () => {
         if (cart.length === 0) {
-            showToast('Your cart is empty', 'Add a dish from the menu to continue.');
+            showToast(
+                'Your cart is empty',
+                'Add a dish from the menu to continue.'
+            );
             return;
         }
+
         setCartOpen(false);
-        routerNavigate('/checkout', { state: { cart } });
+
+        routerNavigate('/checkout', {
+            state: { cart }
+        });
     };
 
     return (
         <header className="header">
+
+            {/* LOGO */}
             <a
                 className="wordmark"
                 href="#home"
@@ -125,23 +217,51 @@ export default function Header({
                     navigate('home');
                 }}
             >
-                <img className="brand-logo" src={logo} alt="Triveni Terrace Café logo" />
+                <img
+                    className="brand-logo"
+                    src={logo}
+                    alt="Triveni Terrace Café logo"
+                />
             </a>
 
-            <nav className={menuOpen ? 'nav nav-open' : 'nav'} aria-label="Main navigation">
+            {/* NAVIGATION */}
+            <nav
+                className={menuOpen ? 'nav nav-open' : 'nav'}
+                aria-label="Main navigation"
+            >
                 {navItems.map(([label, id]) => (
-                    <button key={id} onClick={() => navigate(id)}>{label}</button>
+                    <button
+                        key={id}
+                        onClick={() => navigate(id)}
+                    >
+                        {label}
+                    </button>
                 ))}
 
                 {!user && (
                     <>
-                        <Link to="/login" className="nav-auth-login" onClick={() => setMenuOpen(false)}>Login</Link>
-                        <Link to="/register" className="nav-auth-signup" onClick={() => setMenuOpen(false)}>Sign Up</Link>
+                        <Link
+                            to="/login"
+                            className="nav-auth-login"
+                            onClick={() => setMenuOpen(false)}
+                        >
+                            Login
+                        </Link>
+
+                        <Link
+                            to="/register"
+                            className="nav-auth-signup"
+                            onClick={() => setMenuOpen(false)}
+                        >
+                            Sign Up
+                        </Link>
                     </>
                 )}
             </nav>
 
             <div className="header-actions">
+
+                {/* FAVOURITES */}
                 <button
                     className="header-favorites-button"
                     onClick={() => {
@@ -155,6 +275,7 @@ export default function Header({
                     <span>{favorites.length}</span>
                 </button>
 
+                {/* CART */}
                 <button
                     className="cart-button"
                     onClick={() => {
@@ -168,16 +289,26 @@ export default function Header({
                     <span>{cartCount}</span>
                 </button>
 
-                <Link to="/reservation" className="reserve-button" onClick={() => setMenuOpen(false)}>
+                <Link
+                    to="/reservation"
+                    className="reserve-button"
+                    onClick={() => setMenuOpen(false)}
+                >
                     Reserve a Table
                 </Link>
 
-                <button className="book-button" onClick={() => navigate('visit')}>
-                    Find the café <ArrowUpRight size={18} />
+                <button
+                    className="book-button"
+                    onClick={() => navigate('visit')}
+                >
+                    Find the café
+                    <ArrowUpRight size={18} />
                 </button>
 
+                {/* PROFILE MENU */}
                 {user && (
                     <div className="profile-wrapper">
+
                         <button
                             className="profile-button"
                             onClick={() => setProfileOpen(!profileOpen)}
@@ -189,34 +320,74 @@ export default function Header({
 
                         {profileOpen && (
                             <div className="profile-dropdown">
-                                <p className="profile-email">{user.email}</p>
-                                <Link to="/dashboard" onClick={() => {
-                                    setProfileOpen(false);
-                                    setMenuOpen(false);
-                                }}>
+
+                                <p className="profile-email">
+                                    {user.email}
+                                </p>
+
+                                <Link
+                                    to="/dashboard"
+                                    onClick={() => {
+                                        setProfileOpen(false);
+                                        setMenuOpen(false);
+                                    }}
+                                >
                                     My Account
                                 </Link>
-                                <button onClick={handleLogout}><LogOut size={16} /> Logout</button>
+
+                                {/* ADMIN LINK: ONLY FOR ADMIN ACCOUNTS */}
+                                {isAdmin && (
+                                    <Link
+                                        to="/admin"
+                                        className="admin-dashboard-link"
+                                        onClick={() => {
+                                            setProfileOpen(false);
+                                            setMenuOpen(false);
+                                        }}
+                                    >
+                                        <ShieldCheck size={17} />
+                                        Admin Dashboard
+                                    </Link>
+                                )}
+
+                                <button onClick={handleLogout}>
+                                    <LogOut size={16} />
+                                    Logout
+                                </button>
+
                             </div>
                         )}
                     </div>
                 )}
 
+                {/* MOBILE MENU */}
                 <button
                     className="mobile-toggle"
                     onClick={() => setMenuOpen(!menuOpen)}
                     aria-label="Toggle navigation"
                     aria-expanded={menuOpen}
                 >
-                    {menuOpen ? <X size={26} /> : <Menu size={26} />}
+                    {menuOpen
+                        ? <X size={26} />
+                        : <Menu size={26} />
+                    }
                 </button>
+
             </div>
 
+            {/* CART PANEL */}
             {cartOpen && (
                 <div className="cart-panel">
+
                     <div className="cart-panel-header">
                         <h3>Your Shopping Cart</h3>
-                        <button onClick={() => setCartOpen(false)} aria-label="Close cart"><X size={21} /></button>
+
+                        <button
+                            onClick={() => setCartOpen(false)}
+                            aria-label="Close cart"
+                        >
+                            <X size={21} />
+                        </button>
                     </div>
 
                     {cart.length === 0 ? (
@@ -224,92 +395,180 @@ export default function Header({
                             <ShoppingBag size={35} />
                             <p>Your cart is empty.</p>
                             <span>Add something delicious!</span>
-                            <button onClick={() => navigate('menu')}>Explore Menu</button>
+
+                            <button onClick={() => navigate('menu')}>
+                                Explore Menu
+                            </button>
                         </div>
                     ) : (
                         <>
                             <div className="cart-items">
+
                                 {cart.map((item) => (
-                                    <div className="cart-item" key={item.id}>
-                                        <img src={item.image} alt={item.name} />
+                                    <div
+                                        className="cart-item"
+                                        key={item.id}
+                                    >
+                                        <img
+                                            src={item.image}
+                                            alt={item.name}
+                                        />
+
                                         <div className="cart-item-info">
                                             <h4>{item.name}</h4>
-                                            <p>₹{(Number(item.price) * item.quantity).toFixed(2)}</p>
+
+                                            <p>
+                                                ₹{(
+                                                    Number(item.price) *
+                                                    item.quantity
+                                                ).toFixed(2)}
+                                            </p>
+
                                             <div className="cart-quantity">
+
                                                 <button
-                                                    onClick={() => onUpdateCartQuantity?.(item.id, -1)}
+                                                    onClick={() =>
+                                                        onUpdateCartQuantity?.(
+                                                            item.id,
+                                                            -1
+                                                        )
+                                                    }
                                                     aria-label={`Decrease ${item.name} quantity`}
-                                                ><Minus size={14} /></button>
+                                                >
+                                                    <Minus size={14} />
+                                                </button>
+
                                                 <span>{item.quantity}</span>
+
                                                 <button
-                                                    onClick={() => onUpdateCartQuantity?.(item.id, 1)}
+                                                    onClick={() =>
+                                                        onUpdateCartQuantity?.(
+                                                            item.id,
+                                                            1
+                                                        )
+                                                    }
                                                     aria-label={`Increase ${item.name} quantity`}
-                                                ><Plus size={14} /></button>
+                                                >
+                                                    <Plus size={14} />
+                                                </button>
+
                                             </div>
                                         </div>
+
                                         <button
                                             className="cart-remove"
-                                            onClick={() => onRemoveFromCart?.(item.id)}
+                                            onClick={() =>
+                                                onRemoveFromCart?.(item.id)
+                                            }
                                             aria-label={`Remove ${item.name}`}
-                                        ><Trash2 size={17} /></button>
+                                        >
+                                            <Trash2 size={17} />
+                                        </button>
                                     </div>
                                 ))}
+
                             </div>
+
                             <div className="cart-total">
                                 <span>Total Amount</span>
-                                <strong>₹{cartTotal.toFixed(2)}</strong>
+                                <strong>
+                                    ₹{cartTotal.toFixed(2)}
+                                </strong>
                             </div>
-                            <button className="checkout-button" onClick={handleCheckout}>Review Order & Checkout</button>
+
+                            <button
+                                className="checkout-button"
+                                onClick={handleCheckout}
+                            >
+                                Review Order & Checkout
+                            </button>
                         </>
                     )}
+
                 </div>
             )}
 
+            {/* FAVOURITES PANEL */}
             {favoritesOpen && (
                 <div className="cart-panel favorites-panel">
+
                     <div className="cart-panel-header">
                         <h3>Your Favourites</h3>
-                        <button onClick={() => setFavoritesOpen(false)} aria-label="Close favourites"><X size={21} /></button>
+
+                        <button
+                            onClick={() => setFavoritesOpen(false)}
+                            aria-label="Close favourites"
+                        >
+                            <X size={21} />
+                        </button>
                     </div>
+
                     {favorites.length === 0 ? (
                         <div className="empty-cart">
                             <Heart size={34} />
                             <p>No favourites saved yet.</p>
-                            <span>Tap the heart on a menu item to save it.</span>
-                            <button onClick={() => navigate('menu')}>Explore Menu</button>
+                            <span>
+                                Tap the heart on a menu item to save it.
+                            </span>
+
+                            <button onClick={() => navigate('menu')}>
+                                Explore Menu
+                            </button>
                         </div>
                     ) : (
                         <div className="cart-items">
-                            {favorites.map(item => (
-                                <div className="cart-item" key={item.id}>
-                                    <img src={item.image} alt={item.name} />
+
+                            {favorites.map((item) => (
+                                <div
+                                    className="cart-item"
+                                    key={item}
+                                >
                                     <div className="cart-item-info">
-                                        <h4>{item.name}</h4>
-                                        {item.price != null && <p>₹{Number(item.price).toFixed(2)}</p>}
+                                        <h4>{item}</h4>
+
                                         <button
                                             className="favorite-remove-button"
-                                            onClick={() => onRemoveFavorite?.(item.id)}
+                                            onClick={() =>
+                                                onRemoveFavorite?.(item)
+                                            }
                                         >
                                             Remove from favourites
                                         </button>
                                     </div>
                                 </div>
                             ))}
+
                         </div>
                     )}
+
                 </div>
             )}
 
+            {/* TOAST NOTIFICATION */}
             {toast && (
-                <div className="cafe-toast" role="status" aria-live="polite">
-                    <span className="cafe-toast-icon"><CheckCircle size={19} /></span>
+                <div
+                    className="cafe-toast"
+                    role="status"
+                    aria-live="polite"
+                >
+                    <span className="cafe-toast-icon">
+                        <CheckCircle size={19} />
+                    </span>
+
                     <span className="cafe-toast-copy">
                         <strong>{toast.title}</strong>
                         <small>{toast.description}</small>
                     </span>
-                    <button onClick={() => setToast(null)} aria-label="Dismiss notification"><X size={17} /></button>
+
+                    <button
+                        onClick={() => setToast(null)}
+                        aria-label="Dismiss notification"
+                    >
+                        <X size={17} />
+                    </button>
                 </div>
             )}
+
         </header>
     );
 }

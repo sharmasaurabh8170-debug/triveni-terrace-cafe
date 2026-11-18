@@ -494,3 +494,21 @@
     .favorites-panel { right: 10px; }
     .cafe-toast { right: 10px; }
 }
+/* ADMIN DASHBOARD LINK */
+
+.profile-dropdown .admin-dashboard-link {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: #294b35;
+    font-weight: 600;
+    background: #edf4ed;
+    border-radius: 6px;
+    padding: 11px 12px;
+    transition: 0.25s ease;
+}
+
+.profile-dropdown .admin-dashboard-link:hover {
+    background: #dcebdd;
+    color: #1d3928;
+}
