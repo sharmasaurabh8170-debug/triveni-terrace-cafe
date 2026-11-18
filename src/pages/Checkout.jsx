@@ -10,6 +10,7 @@ import {
 
 import { supabase } from '../lib/supabaseClient';
 import '../styles/auth.css';
+import '../styles/triveni-portal-theme.css';
 
 export default function Checkout() {
     const navigate = useNavigate();

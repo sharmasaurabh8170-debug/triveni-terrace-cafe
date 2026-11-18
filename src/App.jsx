@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 
 import Header from './components/layout/Header.jsx';
 import Footer from './components/layout/Footer.jsx';
@@ -27,6 +27,8 @@ function HomePage() {
     const [favorites, setFavorites] = useState([]);
     const [cart, setCart] = useState([]);
 
+    const routerNavigate = useNavigate();
+
     // Navigate to a section on the homepage
     const navigate = (id) => {
         document.getElementById(id)?.scrollIntoView({
@@ -53,33 +55,43 @@ function HomePage() {
         );
     };
 
-    // Add a dish to cart
+    // Add a dish to cart and automatically open checkout
     const addToCart = (dish) => {
         if (dish.price == null) return;
 
-        setCart((currentCart) => {
-            const existingItem = currentCart.find(
-                (item) => item.id === dish.id
+        const existingItem = cart.find(
+            (item) => item.id === dish.id
+        );
+
+        let updatedCart;
+
+        if (existingItem) {
+            updatedCart = cart.map((item) =>
+                item.id === dish.id
+                    ? {
+                        ...item,
+                        quantity: item.quantity + 1
+                    }
+                    : item
             );
-
-            if (existingItem) {
-                return currentCart.map((item) =>
-                    item.id === dish.id
-                        ? {
-                            ...item,
-                            quantity: item.quantity + 1
-                        }
-                        : item
-                );
-            }
-
-            return [
-                ...currentCart,
+        } else {
+            updatedCart = [
+                ...cart,
                 {
                     ...dish,
                     quantity: 1
                 }
             ];
+        }
+
+        // Update cart state
+        setCart(updatedCart);
+
+        // Navigate to checkout with the updated cart
+        routerNavigate('/checkout', {
+            state: {
+                cart: updatedCart
+            }
         });
     };
 
@@ -149,13 +161,26 @@ export default function App() {
     return (
         <Routes>
             <Route path="/" element={<HomePage />} />
+
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
+
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
+
+            <Route
+                path="/forgot-password"
+                element={<ForgotPassword />}
+            />
+
+            <Route
+                path="/reset-password"
+                element={<ResetPassword />}
+            />
+
             <Route path="/reservation" element={<Reservation />} />
+
             <Route path="/admin" element={<AdminDashboard />} />
+
             <Route path="/checkout" element={<Checkout />} />
         </Routes>
     );

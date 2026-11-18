@@ -3780,3 +3780,100 @@
         align-items: flex-end;
     }
 }
+.reservation-fee-notice {
+    background: #f1f6ed;
+    border: 1px solid #d5e4ce;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 22px;
+    color: #284b35;
+}
+
+.reservation-fee-notice h3 {
+    margin: 0 0 10px;
+    font-size: 19px;
+}
+
+.reservation-fee-amount {
+    font-size: 30px;
+    font-weight: 700;
+    margin: 8px 0;
+}
+
+.reservation-fee-amount span {
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.reservation-fee-notice > p {
+    line-height: 1.6;
+}
+
+.reservation-fee-example {
+    background: #ffffff;
+    border-radius: 9px;
+    padding: 14px;
+    margin-top: 15px;
+}
+
+.reservation-fee-example div {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 7px 0;
+}
+
+.reservation-fee-example hr {
+    border: none;
+    border-top: 1px solid #ddd;
+}
+
+.reservation-payment-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f1f6ed;
+    border-radius: 9px;
+    padding: 15px;
+    margin: 12px 0;
+    color: #284b35;
+}
+
+.reservation-payment-summary strong {
+    font-size: 21px;
+}
+.reservation-refund-notice {
+    background: #fff4ed;
+    border: 1px solid #e8c4ad;
+    border-radius: 10px;
+    padding: 16px;
+    margin-top: 18px;
+    color: #713d27;
+}
+
+.reservation-refund-notice h4 {
+    margin: 0 0 10px;
+    font-size: 16px;
+}
+
+.reservation-refund-notice p {
+    line-height: 1.6;
+    margin: 8px 0;
+}
+
+.reservation-policy-checkbox {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 18px 0;
+    line-height: 1.5;
+    cursor: pointer;
+}
+
+.reservation-policy-checkbox input {
+    width: 17px;
+    height: 17px;
+    margin-top: 3px;
+    flex-shrink: 0;
+    cursor: pointer;
+}

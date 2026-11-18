@@ -125,3 +125,100 @@
     .customer-reservation-card > .order-status { margin-left:57px; }
 }
 
+/* Customer reservation payment details */
+
+.customer-reservation-payment {
+    margin-top: 18px;
+    padding: 16px;
+    background: #f5f8f1;
+    border: 1px solid #dce7d5;
+    border-radius: 10px;
+}
+
+.customer-reservation-detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 9px 0;
+    border-bottom: 1px solid #e1e8dc;
+    color: #536451;
+    font-size: 14px;
+}
+
+.customer-reservation-detail-row:last-of-type {
+    border-bottom: none;
+}
+
+.customer-reservation-detail-row strong {
+    color: #284b35;
+    text-align: right;
+}
+
+.customer-payment-badge {
+    padding: 5px 11px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: capitalize;
+}
+
+.customer-payment-badge.paid {
+    background: #dff3e4;
+    color: #23713b;
+}
+
+.customer-payment-badge.pending {
+    background: #fff0d5;
+    color: #94600b;
+}
+
+.customer-reservation-adjustment {
+    margin-top: 12px;
+    padding: 11px;
+    background: #fff;
+    border-radius: 8px;
+    color: #536451;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.customer-reservation-adjustment p {
+    margin: 0;
+}
+
+.customer-adjustment-success {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    color: #23713b;
+    font-weight: 600;
+}
+
+.customer-adjustment-success svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.customer-reservation-status {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 9px;
+    margin-top: 14px;
+}
+
+.customer-reservation-status > span:first-child {
+    font-size: 13px;
+    color: #64705f;
+}
+
+@media (max-width: 480px) {
+    .customer-reservation-detail-row {
+        font-size: 13px;
+    }
+
+    .customer-reservation-payment {
+        padding: 12px;
+    }
+}
