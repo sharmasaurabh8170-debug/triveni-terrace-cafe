@@ -20,19 +20,54 @@ export default function Login() {
         setLoading(true);
         setMessage('');
 
-        const { error } = await supabase.auth.signInWithPassword({
-            email,
-            password
-        });
+        try {
+            // Step 1: Sign in the user
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: email.trim(),
+                password
+            });
 
-        setLoading(false);
+            if (error) {
+                setMessage(error.message);
+                return;
+            }
 
-        if (error) {
-            setMessage(error.message);
-            return;
+            const userId = data.user?.id;
+
+            if (!userId) {
+                setMessage('Login succeeded, but user information could not be retrieved. Please try again.');
+                return;
+            }
+
+            // Step 2: Check whether the user is an admin
+            const { data: adminRecord, error: adminError } = await supabase
+                .from('admin_users')
+                .select('user_id')
+                .eq('user_id', userId)
+                .maybeSingle();
+
+            if (adminError) {
+                console.error('Admin permission check failed:', adminError);
+
+                setMessage(
+                    'Login successful, but we could not verify your account permissions. Please sign in again or contact the administrator.'
+                );
+                return;
+            }
+
+            // Step 3: Redirect according to account role
+            if (adminRecord) {
+                navigate('/admin', { replace: true });
+            } else {
+                navigate('/dashboard', { replace: true });
+            }
+
+        } catch (error) {
+            console.error('Login error:', error);
+            setMessage('Something went wrong. Please try again.');
+        } finally {
+            setLoading(false);
         }
-
-        navigate('/dashboard');
     };
 
     return (
